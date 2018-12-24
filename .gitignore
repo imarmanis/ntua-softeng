@@ -1,8 +1,14 @@
+# Python - Flask
+__pycache__/
+instance/
+.env
+venv/
+
+# Tex
 *.aux
 *.log
 *.out
 *.pdf
 *.synctex.gz
-
 #only pdfs in docs folder
 !docs/*.pdf
