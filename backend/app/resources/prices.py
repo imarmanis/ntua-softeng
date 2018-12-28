@@ -56,14 +56,14 @@ class PricesResource(Resource):
             return data
 
     @use_args({
-        'start': fields.Int(missing=1, location='query'),
-        'count': fields.Int(missing=20, location='query'),
-        'geoDist': fields.Float(missing=None, location='query'),
-        'geoLng': fields.Float(missing=None, location='query'),
-        'geoLat': fields.Float(missing=None, location='query'),
-        'dateFrom': fields.Date(missing=None, location='query'),
-        'dateTo': fields.Date(missing=None, location='query'),
-        'sort': fields.Str(missing='price|ASC', location='query',
+        'start': fields.Int(missing=1, location='json'),
+        'count': fields.Int(missing=20, location='json'),
+        'geoDist': fields.Float(missing=None, location='json'),
+        'geoLng': fields.Float(missing=None, location='json'),
+        'geoLat': fields.Float(missing=None, location='json'),
+        'dateFrom': fields.Date(missing=None, location='json'),
+        'dateTo': fields.Date(missing=None, location='json'),
+        'sort': fields.Str(missing='price|ASC', location='json',
                            many=True, validate=validate.OneOf(SORT_CHOICE)),
         'format': fields.Str(location='query', validate=validate.Equal('json'))
     })
@@ -121,23 +121,32 @@ class PricesResource(Resource):
         }[sort[0]]
 
         sort_order = {
-            'ASC' : asc,
+            'ASC': asc,
             'DESC': desc
         }[sort[1]]
 
         query = query.order_by(sort_order(sort_field))
-        prices = query.all()
-        return PricesResource.PriceSchema(many=True).dump(prices).data
+        start = args['start']
+        count = args['count']
+        prices_page = query.paginate(start, count)
+        prices = PricesResource.PriceSchema(many=True).dump(prices_page.items).data
+        return {
+            'start': start,
+            'count': count,
+            'total': prices_page.total,
+            'products': prices
+        }
 
     @use_args({
         'price': fields.Float(required=True, location='json'),
         'date': fields.Date(required=True, location='json'),
         'productId': fields.Int(required=True, attribute='product_id', location='json'),
-        'shopId': fields.Int(required=True, attribute='shop_id', location='json')
+        'shopId': fields.Int(required=True, attribute='shop_id', location='json'),
+        'format': fields.Str(location='query', validate=validate.Equal('json'))
     })
     def post(self, args):
         shop = Shop.query.filter_by(id=args['shop_id']).first()
-        product = Product.query.filter_by(id=args['shop_id']).first()
+        product = Product.query.filter_by(id=args['product_id']).first()
         if not (shop and product):
             return bad_request
         new_price = Price(**args)
