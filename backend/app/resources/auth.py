@@ -1,18 +1,63 @@
 from functools import wraps
 from flask import request
-from werkzeug.http import parse_authorization_header
+from app.models import User, db
+from marshmallow import fields
+from webargs.flaskparser import use_args
+from flask_restful import Resource
+from sqlalchemy.exc import IntegrityError
+from secrets import token_urlsafe
 
-
-def check_auth(user):
-    return user.username == 'foo' and user.password == 'bar'
+not_authorized = '', 403
+bad_request = '', 400
 
 
 def requires_auth(f):
-
+    '''
+    decorator to use for resources that need authorization
+    adds 2 kwargs : is_admin, token
+    '''
     @wraps(f)
     def decorated(*args, **kwargs):
-        user = parse_authorization_header(request.headers.get('X-OBSERVATORY-AUTH'))
-        if not (user and check_auth(user)):
+        token = request.headers.get('X-OBSERVATORY-AUTH')
+        user = User.query.filter(User.token == token).first()
+        if not user:
             return {'errors': ['Not authorized']}, 403
+        kwargs['is_admin'] = user.is_admin
+        kwargs['token'] = user.token
         return f(*args, **kwargs)
     return decorated
+
+
+class LogoutResource(Resource):
+    @requires_auth
+    def post(self, token, **_kwargs):
+        User.query.filter(User.token == token).update({'token': None})
+        db.session.commit()
+        return {'message': 'ok'}
+
+
+class LoginResource(Resource):
+    @use_args({
+        'username': fields.Str(required=True, location='json'),
+        'password': fields.Str(required=True, location='json')
+    })
+    def post(self, args):
+        user = User.query.filter(User.username == args['username']).first()
+        if not (user and user.verify_password(args['password'])):
+            return not_authorized
+        if user.token:
+            return bad_request
+
+        ready = False
+        while not ready:
+            ready = True
+            token = token_urlsafe(20)
+            user.token = token
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                ready = False
+                # token collision
+
+        return {'token': user.token}
