@@ -1,6 +1,7 @@
 from flask_restful import Api
 from app.resources.products import ProductsResource
 from app.resources.prices import PricesResource
+from app.resources.shops import ShopsResource
 from app.resources.auth import LoginResource, LogoutResource
 from webargs.flaskparser import parser, abort
 
@@ -13,8 +14,6 @@ def handle_request_parsing_error(err, *_unused):
 api = Api(prefix='/observatory/api')
 api.add_resource(ProductsResource, '/products')
 api.add_resource(PricesResource, '/prices')
-<<<<<<< HEAD
-=======
+api.add_resource(ShopsResource, '/shops')
 api.add_resource(LoginResource, '/login')
 api.add_resource(LogoutResource, '/logout')
->>>>>>> 51506daec1b952cda0f0e7bf1da2f6570358955f
