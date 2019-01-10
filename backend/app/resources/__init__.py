@@ -12,6 +12,7 @@ def handle_request_parsing_error(err, *_unused):
 
 api = Api(prefix='/observatory/api')
 api.add_resource(ProductsResource, '/products')
+api.add_resource(ProductResource, '/products/<int:prod_id>')
 api.add_resource(PricesResource, '/prices')
 api.add_resource(LoginResource, '/login')
 api.add_resource(LogoutResource, '/logout')

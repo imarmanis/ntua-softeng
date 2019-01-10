@@ -37,6 +37,9 @@ class ProductsResource(Resource):
         }
 
     def post(self):
-        raise NotImplemented
+        raise NotImplementedError
         # db.session.add(product_object)
         # db.session.commit()
+
+class ProductResource(Resource):
+    pass
