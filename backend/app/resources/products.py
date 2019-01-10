@@ -3,8 +3,12 @@ from webargs import fields
 from webargs.flaskparser import use_args
 from marshmallow import validate
 
-from app.models import Product, ProductSchema
+from app.models import Product
 from app.resources.auth import requires_auth
+
+class ProductSchema(ma.ModelSchema):
+    class Meta:
+        model = Product
 
 SORT_CHOICE = ['id|ASC', 'id|DESC', 'name|ASC', 'name|DESC']
 prod_schema = ProductSchema()
