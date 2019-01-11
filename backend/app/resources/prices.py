@@ -13,12 +13,10 @@ SORT_CHOICE = list(map('|'.join, itertools.product(['geoDist', 'price', 'date'],
                                                    ['ASC', 'DESC'])))
 
 bad_request = '', 400
-not_found = '', 404
 
 
 class PricesResource(Resource):
     class PriceSchema(ma.ModelSchema):
-
         class ProductSchema(ma.ModelSchema):
             class ProductTagSchema(ma.ModelSchema):
                 name = fields.String()
@@ -70,8 +68,8 @@ class PricesResource(Resource):
             return data
 
     @use_args({
-        'start': fields.Int(missing=1, location='query'),
-        'count': fields.Int(missing=20, location='query'),
+        'start': fields.Int(missing=1, location='query', validate=validate.Range(min=0)),
+        'count': fields.Int(missing=20, location='query', validate=validate.Range(min=0)),  # zero count is ok ?
         'geoDist': fields.Float(missing=None, location='query'),
         'geoLng': fields.Float(missing=None, location='query'),
         'geoLat': fields.Float(missing=None, location='query'),
@@ -79,26 +77,23 @@ class PricesResource(Resource):
         'dateTo': fields.Date(missing=None, location='query'),
         'sort': fields.Str(missing='price|ASC', location='query',
                            many=True, validate=validate.OneOf(SORT_CHOICE)),
-        'format': fields.Str(location='query', validate=validate.Equal('json'))
+        'shops': fields.List(fields.Int(), missing=None, location='query'),
+        'products': fields.List(fields.Int(), missing=None, location='query'),
+        'tags': fields.List(fields.Str(), missing=None, location='query'),
+        'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))
     })
     def get(self, args):
-        shops_param = request.args.getlist('shops')
-        products_param = request.args.getlist('products')
-        tags_param = request.args.getlist('tags')
-        try:
-            shop_ids = fields.List(fields.Int(location='query')).deserialize(shops_param)
-            products_ids = fields.List(fields.Int(location='query')).deserialize(products_param)
-            tags = fields.List(fields.Str(location='query')).deserialize(tags_param)
-        except ValidationError:
-            return bad_request
-        # Couldn't find easier way to parse duplicate arguments...
+        shop_ids = args['shops']
+        product_ids = args['products']
+        tags = args['tags']
 
         with_geo = args['geoDist'] is not None and args['geoLng'] is not None and args['geoLat'] is not None
         no_geo = args['geoDist'] is None and args['geoLng'] is None and args['geoLat'] is None
         if not (with_geo or no_geo):
             return bad_request
 
-        with_date = args['dateFrom'] is not None and args['dateTo'] is not None
+        with_date = (args['dateFrom'] is not None and args['dateTo'] is not None) and \
+                    (args['dateFrom'] <= args['dateTo'])
         no_date = args['dateFrom'] is None and args['dateTo'] is None
         if not (with_date or no_date):
             return bad_request
@@ -111,7 +106,7 @@ class PricesResource(Resource):
 
         if with_geo:
             dist = Shop.distance(args['geoLat'], args['geoLng']).label('dist')
-            query = db.session.query(Price, dist).filter(dist < args['geoDist'])
+            query = db.session.query(Price, dist)
         else:
             dist = None
             query = Price.query
@@ -120,16 +115,22 @@ class PricesResource(Resource):
         today = date.today()
         date_from = args['dateFrom'] if args['dateFrom'] else today
         date_to = args['dateTo'] if args['dateTo'] else today
-        query = query.filter(date_from <= Price.date, Price.date <= date_to)
+        query = query.filter(Price.date.between(date_from, date_to))
 
         if shop_ids:
             query = query.filter(Shop.id.in_(shop_ids))
-        if products_ids:
-            query = query.filter(Product.id.in_(products_ids))
+        if product_ids:
+            query = query.filter(Product.id.in_(product_ids))
 
         if tags:
             query = query.filter(or_(Product.tags.any(func.lower(ProductTag.name).in_(map(str.lower, tags))),
                                  Shop.tags.any(func.lower(ShopTag.name).in_(map(str.lower, tags)))))
+
+        if with_geo:
+            subq = query.subquery()
+            query = db.session.query(Price, subq.c.dist).select_entity_from(subq).filter(subq.c.dist < args['geoDist'])
+            # nested query to avoid recalculating distance expr
+            # WHERE and HAVING clauses can't refer to column names (dist)
 
         sort_field = {
             'geoDist': dist,
@@ -143,9 +144,10 @@ class PricesResource(Resource):
         }[sort[1]]
 
         query = query.order_by(sort_order(sort_field))
+
         start = args['start']
         count = args['count']
-        prices_page = query.paginate(start, count)
+        prices_page = query.paginate(start + 1, count, False)
         prices = PricesResource.PriceSchema(many=True).dump(prices_page.items).data
         return {
             'start': start,
@@ -155,18 +157,22 @@ class PricesResource(Resource):
         }
 
     @use_args({
-        'price': fields.Float(required=True, location='json'),
-        'date': fields.Date(required=True, location='json'),
-        'productId': fields.Int(required=True, attribute='product_id', location='json'),
-        'shopId': fields.Int(required=True, attribute='shop_id', location='json'),
-        'format': fields.Str(location='query', validate=validate.Equal('json'))
+        'price': fields.Float(required=True, location='form'),
+        'date': fields.Date(required=True, location='form'),
+        'productId': fields.Int(required=True, attribute='product_id', location='form'),
+        'shopId': fields.Int(required=True, attribute='shop_id', location='form'),
+        'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))
     })
     def post(self, args):
         shop = Shop.query.filter_by(id=args['shop_id']).first()
         product = Product.query.filter_by(id=args['product_id']).first()
         if not (shop and product):
             return bad_request
+        del args['format']
         new_price = Price(**args)
         db.session.add(new_price)
         db.session.commit()
+        # TODO
+        # UniqueConstraint on (shop_id, product_id, date) necessary ?
+        # Maybe use '~ INSER [] ON DUPLICATE KEY UPDATE' dbms specific statement
         return PricesResource.PriceSchema().dump(new_price).data
