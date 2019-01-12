@@ -1,7 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
-from sqlalchemy.dialects.mysql import MEDIUMTEXT
 from sqlalchemy.ext.hybrid import hybrid_method
 from sqlalchemy import func
 import math
@@ -27,11 +26,19 @@ class Product(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(255), nullable=False)
-    description = db.Column(MEDIUMTEXT)
+    description = db.Column(db.String(255))
     category = db.Column(db.String(128), nullable=False)
     withdrawn = db.Column(db.Boolean, nullable=False, default=False)
-    tags = db.Column(MEDIUMTEXT)
+    tags = db.relationship('ProductTag', lazy='joined', backref='product')
     prices = db.relationship('Price', lazy='joined', backref='product')
+
+
+class ProductTag(db.Model):
+    __tablename__ = 'productTag'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(128), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
 
 
 class Shop(db.Model):
@@ -53,7 +60,16 @@ class Shop(db.Model):
                          func.cos(func.radians(lng) - func.radians(cls.lng)) +
                          func.sin(func.radians(cls.lat)) * func.sin(func.radians(lat))) * 6371
 
+    tags = db.relationship('ShopTag', lazy='joined', backref='shop')
     prices = db.relationship('Price', lazy='joined', backref='shop')
+
+
+class ShopTag(db.Model):
+    __tablename__ = 'shopTag'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(128), nullable=False)
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'), nullable=False)
 
 
 class User(db.Model):
@@ -75,8 +91,3 @@ class User(db.Model):
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
-
-
-class ProductSchema(ma.ModelSchema):
-    class Meta:
-        model = Product

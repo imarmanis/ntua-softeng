@@ -6,28 +6,42 @@ from webargs import fields
 from webargs.flaskparser import use_args
 from marshmallow import validate, ValidationError
 from marshmallow.decorators import post_dump, pre_dump
-from app.models import Product, Shop, Price, db, ma
-from sqlalchemy import asc, desc
+from app.models import Product, Shop, Price, db, ma, ProductTag, ShopTag
+from sqlalchemy import asc, desc, func, or_
 
 SORT_CHOICE = list(map('|'.join, itertools.product(['geoDist', 'price', 'date'],
                                                    ['ASC', 'DESC'])))
 
-ids_field = fields.List(fields.Int())
 bad_request = '', 400
 not_found = '', 404
 
 
 class PricesResource(Resource):
     class PriceSchema(ma.ModelSchema):
+
         class ProductSchema(ma.ModelSchema):
+            class ProductTagSchema(ma.ModelSchema):
+                name = fields.String()
+
+                @post_dump
+                def flatten(self, data):
+                    return data['name']
+
             productId = fields.Int(attribute="id")
             productName = fields.String(attribute="name")
-            productTags = fields.Str(attribute="tags")
+            productTags = fields.Nested(ProductTagSchema, many=True, attribute='tags')
 
         class ShopSchema(ma.ModelSchema):
+            class ShopTagSchema(ma.ModelSchema):
+                name = fields.String()
+
+                @post_dump
+                def flatten(self, data):
+                    return data['name']
+
             shopId = fields.Int(attribute='id')
             shopName = fields.Str(attribute='name')
-            shopTags = fields.DelimitedList(fields.Str(), attribute='tags')
+            shopTags = fields.Nested(ShopTagSchema, many=True, attribute='tags')
             shopAddress = fields.Str(attribute='address')
 
         price = fields.Float()
@@ -56,23 +70,25 @@ class PricesResource(Resource):
             return data
 
     @use_args({
-        'start': fields.Int(missing=1, location='json'),
-        'count': fields.Int(missing=20, location='json'),
-        'geoDist': fields.Float(missing=None, location='json'),
-        'geoLng': fields.Float(missing=None, location='json'),
-        'geoLat': fields.Float(missing=None, location='json'),
-        'dateFrom': fields.Date(missing=None, location='json'),
-        'dateTo': fields.Date(missing=None, location='json'),
-        'sort': fields.Str(missing='price|ASC', location='json',
+        'start': fields.Int(missing=1, location='query'),
+        'count': fields.Int(missing=20, location='query'),
+        'geoDist': fields.Float(missing=None, location='query'),
+        'geoLng': fields.Float(missing=None, location='query'),
+        'geoLat': fields.Float(missing=None, location='query'),
+        'dateFrom': fields.Date(missing=None, location='query'),
+        'dateTo': fields.Date(missing=None, location='query'),
+        'sort': fields.Str(missing='price|ASC', location='query',
                            many=True, validate=validate.OneOf(SORT_CHOICE)),
         'format': fields.Str(location='query', validate=validate.Equal('json'))
     })
     def get(self, args):
         shops_param = request.args.getlist('shops')
         products_param = request.args.getlist('products')
+        tags_param = request.args.getlist('tags')
         try:
-            shop_ids = ids_field.deserialize(shops_param)
-            products_ids = ids_field.deserialize(products_param)
+            shop_ids = fields.List(fields.Int(location='query')).deserialize(shops_param)
+            products_ids = fields.List(fields.Int(location='query')).deserialize(products_param)
+            tags = fields.List(fields.Str(location='query')).deserialize(tags_param)
         except ValidationError:
             return bad_request
         # Couldn't find easier way to parse duplicate arguments...
@@ -111,8 +127,9 @@ class PricesResource(Resource):
         if products_ids:
             query = query.filter(Product.id.in_(products_ids))
 
-        # TODO tags
-        # maybe leave them as comma separated attribute
+        if tags:
+            query = query.filter(or_(Product.tags.any(func.lower(ProductTag.name).in_(map(str.lower, tags))),
+                                 Shop.tags.any(func.lower(ShopTag.name).in_(map(str.lower, tags)))))
 
         sort_field = {
             'geoDist': dist,
@@ -134,7 +151,7 @@ class PricesResource(Resource):
             'start': start,
             'count': count,
             'total': prices_page.total,
-            'products': prices
+            'prices': prices
         }
 
     @use_args({
