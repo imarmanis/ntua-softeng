@@ -19,6 +19,8 @@ def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.headers.get('X-OBSERVATORY-AUTH')
+        if not token:
+            return {'errors': ['No authorization token provided']}, 403
         user = User.query.filter(User.token == token).first()
         if not user:
             return {'errors': ['Not authorized']}, 403
