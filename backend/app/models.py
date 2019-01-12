@@ -29,7 +29,9 @@ class Product(db.Model):
     description = db.Column(db.String(255))
     category = db.Column(db.String(128), nullable=False)
     withdrawn = db.Column(db.Boolean, nullable=False, default=False)
+    tags = db.relationship('ProductTag', lazy='joined', backref='product')
     prices = db.relationship('Price', lazy='joined', backref='product')
+
 
 class ProductTag(db.Model):
     __tablename__ = 'productTag'
@@ -50,6 +52,7 @@ class Shop(db.Model):
     prices = db.relationship('Price', lazy='joined', backref='shop')
     withdrawn = db.Column(db.Boolean, nullable=False, default=False)	
     address = db.Column(db.String(255), nullable=False)
+
     @hybrid_method
     def distance(self, lat, lng):
         return math.acos(math.cos(math.radians(self.lat)) * math.cos(math.radians(lat)) *
@@ -65,11 +68,13 @@ class Shop(db.Model):
     tags = db.relationship('ShopTag', lazy='joined', backref='shop')
     prices = db.relationship('Price', lazy='joined', backref='shop')
 
+
 class ShopTag(db.Model):
    __tablename__ = 'shopTag'
    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
    name = db.Column(db.String(128), nullable=False)
    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'), nullable=False)
+
 
 class User(db.Model):
     __tablename__ = 'user'
