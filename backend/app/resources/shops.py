@@ -8,6 +8,8 @@ from marshmallow import validate, ValidationError
 from marshmallow.decorators import post_dump, pre_dump
 from app.models import Product, Shop,ShopTag, Price, db, ma
 from sqlalchemy import asc, desc
+from app.resources.auth import requires_auth
+
 
 SORT_CHOICE = list(map('|'.join, itertools.product(['name', 'id'],
                                                    ['ASC', 'DESC'])))
@@ -132,15 +134,16 @@ class ShopResource(Resource):
             setattr(shop, changed, args[changed])
         db.session.commit()
         return ShopSchema().dump(shop.data)
-
+    
+    @requires_auth
     @use_args({
         'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))
     })
-    def delete(self, _args, shop_id):
+    def delete(self, _args, shop_id,is_admin):
         shop = Shop.query.get_or_404(shop_id)
-#        if is_admin:
-        db.session.delete(shop)
-#        else:
-#            shop.withdrawn = True
+        if is_admin:
+            db.session.delete(shop)
+        else:
+            shop.withdrawn = True
         db.session.commit()
         return {'message', 'OK'}
