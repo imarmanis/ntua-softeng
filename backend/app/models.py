@@ -18,8 +18,8 @@ class Price(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     price = db.Column(db.Float, nullable=False)
     date = db.Column(db.Date, nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
-    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id', ondelete="CASCADE"), nullable=False)
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id', ondelete="CASCADE"), nullable=False)
 
 
 class Product(db.Model):
@@ -30,8 +30,10 @@ class Product(db.Model):
     description = db.Column(db.String(255))
     category = db.Column(db.String(128), nullable=False)
     withdrawn = db.Column(db.Boolean, nullable=False, default=False)
-    tags = db.relationship('ProductTag', lazy='joined', backref='product')
-    prices = db.relationship('Price', lazy='joined', backref='product')
+    tags = db.relationship('ProductTag', lazy='joined', backref='product',
+                           passive_deletes=True, cascade="all, delete-orphan")
+    prices = db.relationship('Price', lazy='joined', backref='product',
+                             passive_deletes=True, cascade="all, delete-orphan")
 
 
 class ProductTag(db.Model):
@@ -39,7 +41,7 @@ class ProductTag(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(128), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id', ondelete="CASCADE"), nullable=False)
 
 
 class Shop(db.Model):
@@ -49,8 +51,10 @@ class Shop(db.Model):
     lng = db.Column(db.Float, nullable=False)
     lat = db.Column(db.Float, nullable=False)
     name = db.Column(db.String(255), nullable=False)
-    tags = db.relationship('ShopTag', lazy='joined', backref='shop')
-    prices = db.relationship('Price', lazy='joined', backref='shop')
+    tags = db.relationship('ShopTag', lazy='joined', backref='shop',
+                           passive_deletes=True, cascade="all, delete-orphan")
+    prices = db.relationship('Price', lazy='joined', backref='shop',
+                             passive_deletes=True, cascade="all, delete-orphan")
     withdrawn = db.Column(db.Boolean, nullable=False, default=False)
     address = db.Column(db.String(255), nullable=False)
 
@@ -72,7 +76,7 @@ class ShopTag(db.Model):
  
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(128), nullable=False)
-    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'), nullable=False)
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id', ondelete="CASCADE"), nullable=False)
 
 
 class User(db.Model):
