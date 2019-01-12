@@ -1,9 +1,9 @@
 from flask_restful import Api
+from webargs.flaskparser import parser, abort
 from app.resources.products import ProductsResource, ProductResource
 from app.resources.prices import PricesResource
-from app.resources.shops import ShopsResource,ShopResource
+from app.resources.shops import ShopsResource, ShopResource
 from app.resources.auth import LoginResource, LogoutResource
-from webargs.flaskparser import parser, abort
 
 
 @parser.error_handler

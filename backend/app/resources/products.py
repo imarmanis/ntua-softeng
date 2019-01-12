@@ -3,9 +3,9 @@ from webargs import fields
 from webargs.flaskparser import use_args
 import marshmallow
 from marshmallow import validate, post_dump
-
 from app.models import db, ma, Product, ProductTag
 from app.resources.auth import requires_auth
+
 
 class ProductTagSchema(ma.ModelSchema):
     # This is necessary because we require tags to be a list of names (strings),
@@ -18,6 +18,7 @@ class ProductTagSchema(ma.ModelSchema):
         model = ProductTag
         # Fields to be included in the output
         fields = ('name', )
+
 
 class ProductSchema(ma.ModelSchema):
     # Override tags field to use a nested representation rather than keys
@@ -84,6 +85,7 @@ class ProductsResource(Resource):
         db.session.commit()
 
         return prod_schema.dump(product).data
+
 
 class ProductResource(Resource):
     @use_args({

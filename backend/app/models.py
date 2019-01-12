@@ -1,10 +1,11 @@
+import math
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from sqlalchemy.ext.hybrid import hybrid_method
 from sqlalchemy import func
-import math
 from werkzeug.security import generate_password_hash, check_password_hash
+
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -50,7 +51,7 @@ class Shop(db.Model):
     name = db.Column(db.String(255), nullable=False)
     tags = db.relationship('ShopTag', lazy='joined', backref='shop')
     prices = db.relationship('Price', lazy='joined', backref='shop')
-    withdrawn = db.Column(db.Boolean, nullable=False, default=False)	
+    withdrawn = db.Column(db.Boolean, nullable=False, default=False)
     address = db.Column(db.String(255), nullable=False)
 
     @hybrid_method
@@ -65,15 +66,13 @@ class Shop(db.Model):
                          func.cos(func.radians(lng) - func.radians(cls.lng)) +
                          func.sin(func.radians(cls.lat)) * func.sin(func.radians(lat))) * 6371
 
-    tags = db.relationship('ShopTag', lazy='joined', backref='shop')
-    prices = db.relationship('Price', lazy='joined', backref='shop')
-
 
 class ShopTag(db.Model):
-   __tablename__ = 'shopTag'
-   id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-   name = db.Column(db.String(128), nullable=False)
-   shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'), nullable=False)
+    __tablename__ = 'shopTag'
+ 
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(128), nullable=False)
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'), nullable=False)
 
 
 class User(db.Model):
