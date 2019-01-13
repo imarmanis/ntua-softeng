@@ -1,10 +1,9 @@
 import itertools
-from datetime import date
+from datetime import date, timedelta
 from flask_restful import Resource
-from flask import request
 from webargs import fields
 from webargs.flaskparser import use_args
-from marshmallow import validate, ValidationError
+from marshmallow import validate
 from marshmallow.decorators import post_dump, pre_dump
 from app.models import Product, Shop, Price, db, ma, ProductTag, ShopTag
 from sqlalchemy import asc, desc, func, or_
@@ -158,21 +157,31 @@ class PricesResource(Resource):
 
     @use_args({
         'price': fields.Float(required=True, location='form'),
-        'date': fields.Date(required=True, location='form'),
+        'dateFrom': fields.Date(required=True, location='form'),
+        'dateTo': fields.Date(required=True, location='form'),
         'productId': fields.Int(required=True, attribute='product_id', location='form'),
         'shopId': fields.Int(required=True, attribute='shop_id', location='form'),
         'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))
     })
     def post(self, args):
+        date1 = args['dateFrom']
+        date2 = args['dateTo']
+        if not (date1 <= date2):
+            return bad_request
+
         shop = Shop.query.filter_by(id=args['shop_id']).first()
         product = Product.query.filter_by(id=args['product_id']).first()
         if not (shop and product):
             return bad_request
         del args['format']
-        new_price = Price(**args)
-        db.session.add(new_price)
+        del args['dateFrom']
+        del args['dateTo']
+
+        new_prices = [Price(**args, date=d) for d in
+                      [date1 + timedelta(days=x) for x in range((date2-date1).days + 1)]]
+        db.session.add_all(new_prices)
         db.session.commit()
         # TODO
         # UniqueConstraint on (shop_id, product_id, date) necessary ?
-        # Maybe use '~ INSER [] ON DUPLICATE KEY UPDATE' dbms specific statement
-        return PricesResource.PriceSchema().dump(new_price).data
+        # Maybe use '~ INSERT [] ON DUPLICATE KEY UPDATE' dbms specific statement
+        return PricesResource.PriceSchema(many=True).dump(new_prices).data
