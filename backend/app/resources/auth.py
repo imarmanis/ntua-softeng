@@ -35,7 +35,7 @@ class LogoutResource(Resource):
     def post(self, token, **_kwargs):
         User.query.filter(User.token == token).update({'token': None})
         db.session.commit()
-        return {'message': 'ok'}
+        return {'message': 'OK'}
 
 
 class LoginResource(Resource):
