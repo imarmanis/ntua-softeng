@@ -40,8 +40,8 @@ class LogoutResource(Resource):
 
 class LoginResource(Resource):
     @use_args({
-        'username': fields.Str(required=True, location='json'),
-        'password': fields.Str(required=True, location='json')
+        'username': fields.Str(required=True, location='form'),
+        'password': fields.Str(required=True, location='form')
     })
     def post(self, args):
         user = User.query.filter(User.username == args['username']).first()
