@@ -67,7 +67,7 @@ class PricesResource(Resource):
             return data
 
     @use_args({
-        'start': fields.Int(missing=1, location='query', validate=validate.Range(min=0)),
+        'start': fields.Int(missing=0, location='query', validate=validate.Range(min=0)),
         'count': fields.Int(missing=20, location='query', validate=validate.Range(min=0)),  # zero count is ok ?
         'geoDist': fields.Float(missing=None, location='query'),
         'geoLng': fields.Float(missing=None, location='query'),
