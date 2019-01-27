@@ -1,6 +1,6 @@
 import pytest
 from app import create_app
-from app.models import db, Product, Shop, User
+from app.models import db, User
 from tests import data
 
 
@@ -17,22 +17,26 @@ def client(request):
         db.drop_all()
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def user1():
-    user = User(**data.user1)
+    user = User(**data.users[0])
     db.session.add(user)
     db.session.commit()
-    yield
+    yield data.users[0]
     db.session.delete(user)
     db.session.commit()
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 def root():
     user = User(**data.root, is_admin=True)
     db.session.add(user)
     db.session.commit()
-    yield
+    yield user
     db.session.delete(user)
     db.session.commit()
 
+
+@pytest.fixture(scope="module")
+def user1_token():
+    return User.query.filter(User.username == data.users[0]['username']).first().token
