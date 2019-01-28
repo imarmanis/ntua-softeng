@@ -5,24 +5,16 @@
 npm install
 ```
 
-### Compiles and hot-reloads for development
+## After installing dependencies overwrite "./node_modules/vee-validate/dist/locale/el.js" file with "./el.js"
+
+## Serve with hot reload at localhost:8080
 ```
-npm run serve
+npm run dev
 ```
 
-### Compiles and minifies for production
+## Build for production with minification
 ```
 npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
 ```
 
 ### Customize configuration
