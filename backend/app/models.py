@@ -1,10 +1,8 @@
-import math
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
-from sqlalchemy.ext.hybrid import hybrid_method
-from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
+from geoalchemy2 import Geometry
 
 
 db = SQLAlchemy()
@@ -48,8 +46,7 @@ class Shop(db.Model):
     __tablename__ = 'shop'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    lng = db.Column(db.Float, nullable=False)
-    lat = db.Column(db.Float, nullable=False)
+    position = db.Column(Geometry(geometry_type='POINT', srid=4326), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     tags = db.relationship('ShopTag', lazy='joined', backref='shop',
                            passive_deletes=True, cascade="all, delete-orphan")
@@ -58,22 +55,10 @@ class Shop(db.Model):
     withdrawn = db.Column(db.Boolean, nullable=False, default=False)
     address = db.Column(db.String(255), nullable=False)
 
-    @hybrid_method
-    def distance(self, lat, lng):
-        return math.acos(math.cos(math.radians(self.lat)) * math.cos(math.radians(lat)) *
-                         math.cos(math.radians(self.lng) - math.radians(lng)) +
-                         math.sin(math.radians(self.lat)) * math.sin(math.radians(lat))) * 6371
-
-    @distance.expression
-    def distance(cls, lat, lng):
-        return func.acos(func.cos(func.radians(cls.lat)) * func.cos(func.radians(lat)) *
-                         func.cos(func.radians(lng) - func.radians(cls.lng)) +
-                         func.sin(func.radians(cls.lat)) * func.sin(func.radians(lat))) * 6371
-
 
 class ShopTag(db.Model):
     __tablename__ = 'shopTag'
- 
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(128), nullable=False)
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id', ondelete="CASCADE"), nullable=False)
