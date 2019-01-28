@@ -55,7 +55,7 @@ class ShopsResource(Resource):
     })
     def get(self, args):
         query = Shop.query
-        start = args['start']+1
+        start = args['start']
         count = args['count']
         status = args['status']
         sort = {
@@ -67,12 +67,13 @@ class ShopsResource(Resource):
         if status != 'ALL':
             query = query.filter_by(withdrawn=(status == 'WITHDRAWN'))
         query = query.order_by(sort)
-        shops_page = query.paginate(start, count)
-        shops = shop_schema.dump(shops_page.items, many=True).data
+        total = query.count()
+        shops_page = query.offset(start).limit(count).all()
+        shops = shop_schema.dump(shops_page, many=True).data
         return {
-            'start': shops_page.page-1,
-            'count': len(shops_page.items),
-            'total': shops_page.total,
+            'start': min(start, total), # rows skipped due to offset
+            'count': len(shops_page),
+            'total': total,
             'shops': shops
         }
 
@@ -101,7 +102,7 @@ class ShopResource(Resource):
     def get(self, _args, shop_id):
         shop = Shop.query.get_or_404(shop_id)
         return shop_schema.dump(shop).data
-    
+ 
     @requires_auth
     @use_args({
         'name': fields.Str(required=True, location='form'),
@@ -121,7 +122,7 @@ class ShopResource(Resource):
         shop.tags = [ShopTag(name=tag, shop=shop) for tag in args['tags'] if tag.strip()]
         db.session.commit()
         return shop_schema.dump(shop).data
-    
+ 
     @requires_auth
     @use_args({
         'name': fields.Str(location='form'),
@@ -152,7 +153,7 @@ class ShopResource(Resource):
             setattr(shop, changed, args[changed])
         db.session.commit()
         return ShopSchema().dump(shop).data
-    
+ 
     @requires_auth
     @use_args({
         'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))

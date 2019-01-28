@@ -151,12 +151,13 @@ class PricesResource(Resource):
 
         start = args['start']
         count = args['count']
-        prices_page = query.paginate(start + 1, count, False)
-        prices = PricesResource.PriceSchema(many=True).dump(prices_page.items).data
+        total = query.count()
+        prices_page = query.offset(start).limit(count).all()
+        prices = PricesResource.PriceSchema(many=True).dump(prices_page).data
         return {
-            'start': start,
-            'count': count,
-            'total': prices_page.total,
+            'start': min(start, total), # rows skipped due to offset
+            'count': len(prices_page),
+            'total': total,
             'prices': prices
         }
 

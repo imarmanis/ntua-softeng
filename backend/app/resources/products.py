@@ -39,7 +39,7 @@ class ProductsResource(Resource):
 
     @use_args({
         'start': fields.Int(missing=0, location='query', validate=validate.Range(min=0)),
-        'count': fields.Int(missing=20, location='query', validate=validate.Range(min=1)),
+        'count': fields.Int(missing=20, location='query', validate=validate.Range(min=0)),
         'status': fields.Str(missing='ACTIVE', location='query',
                              validate=validate.OneOf(_STATUS_CHOICE)),
         'sort': fields.Str(missing='id|DESC', location='query',
@@ -47,7 +47,7 @@ class ProductsResource(Resource):
         'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))
     })
     def get(self, args, **_kwargs):
-        start = args['start'] + 1   # Pagination is 1-indexed
+        start = args['start']
         count = args['count']
         status = args['status']
         sort = {
@@ -59,13 +59,14 @@ class ProductsResource(Resource):
         query = Product.query
         if status != 'ALL':
             query = query.filter_by(withdrawn=(status == 'WITHDRAWN'))
-        products = query.order_by(sort).paginate(start, count, False)
+        total = query.count()
+        products = query.order_by(sort).offset(start).limit(count).all()
 
         return {
-            'start': products.page - 1,
-            'count': len(products.items),
-            'total': products.total,
-            'products': prod_schema.dump(products.items, many=True).data
+            'start': min(start, total), # rows skipped due to offset
+            'count': len(products),
+            'total': total,
+            'products': prod_schema.dump(products, many=True).data
         }
 
     @requires_auth
