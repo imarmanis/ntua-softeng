@@ -20,13 +20,15 @@ shops = [
         'lng': 1,
         'lat': 2,
         'name': 'Shell',
-        'address': 'Foo 42'
+        'address': 'Foo 42',
+        'tags': ["Big", "Expensive"]
     },
     {
         'lng': 3,
         'lat': 4,
         'name': 'BP',
-        'address': 'Bar 17'
+        'address': 'Bar 17',
+        'tags': ["Small", "Cheap"]
     }
 ]
 
