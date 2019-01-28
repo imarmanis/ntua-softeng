@@ -32,13 +32,12 @@ class ShopSchema(ma.ModelSchema):
 
     class Meta:
         model = Shop
-        fields = ('id', 'name', 'address', 'withdrawn')
+        fields = ('id', 'name', 'tags', 'lat', 'lng', 'address', 'withdrawn')
 
     @pre_dump
     def position_to_xy(self, data):
-        point = to_shape(data['position'])
-        del data['position']
-        data['lng'], data['lat'] = point.x, point.y
+        point = to_shape(data.position)
+        data.lng, data.lat = point.x, point.y
         return data
 
 
@@ -86,7 +85,7 @@ class ShopsResource(Resource):
         'tags': fields.List(fields.String(), required=True, location='form'),
         'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))
     })
-    def post(self, args):
+    def post(self, args, **_kwargs):
         position = from_shape(Point(args['lng'], args['lat']), srid=4326)
         new_shop = Shop(name=args['name'], address=args['address'], position=position, withdrawn=False)
         new_shop.tags = [ShopTag(name=tag, shop=new_shop) for tag in args['tags'] if tag.strip()]
@@ -99,7 +98,7 @@ class ShopResource(Resource):
     @use_args({
         'format': fields.Str(location='query', validate=validate.Equal('json'))
     })
-    def get(self, shop_id, **_kwargs):
+    def get(self, _args, shop_id):
         shop = Shop.query.get_or_404(shop_id)
         return shop_schema.dump(shop).data
     
@@ -112,7 +111,7 @@ class ShopResource(Resource):
         'tags': fields.List(fields.Str(), required=True, location='form'),
         'format': fields.Str(location='query', validate=validate.Equal('json'))
     })
-    def put(self, args, shop_id):
+    def put(self, args, shop_id, **_kwargs):
         shop = Shop.query.get_or_404(shop_id)
         shop.name = args['name']
         shop.address = args['address']
@@ -132,7 +131,7 @@ class ShopResource(Resource):
         'tags': fields.List(fields.Str(), location='form'),
         'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))
     })
-    def patch(self, args, shop_id):
+    def patch(self, args, shop_id, **_kwargs):
         del args['format']
         if len(args) != 1:
             return 'Specify exactly one of: name, address, lng, lat, tags', 400
@@ -152,7 +151,7 @@ class ShopResource(Resource):
         else:
             setattr(shop, changed, args[changed])
         db.session.commit()
-        return ShopSchema().dump(shop.data)
+        return ShopSchema().dump(shop).data
     
     @requires_auth
     @use_args({
