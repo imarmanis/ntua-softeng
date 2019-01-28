@@ -32,18 +32,33 @@ flask db migrate -m "Added foobar table" : δημιουργεί το script πο
 flask db upgrade : upgrade τη βάση στο πιο πρόσφατο σχήμα
 ```
 
+
+#### DBMS
+
+Για geospatial db με υποστήριξη ORM (geoalchemy) χρειαζόμαστε PostgreSQL με το PostGIS extension.
+
+##### Παράδειγμα εγκατάστασης με docker
+```bash
+docker volume create pg_data
+docker run --name postgis -e POSTGRES_PASSWORD=root -e POSTGRES_USER=root -e POSTGRES_DB=restapi -v pg_data:/var/lib/postgresql/data -p 5432:5432 -d mdillon/postgis
+```
+
+Σε κάθε επόμενη έναρξη :
+```bash
+docker start postgis
+```
+
 ### Configurations
 
 Tα βασικά στο config.py.
 
 Στο instance/config.py (μένει εκτός git) βάζει ο καθένας τα δικά του, θα κάνουν override το config.py.
 
-Πχ το instance/config.py για mysql:
+Πχ το instance/config.py για postgreSQ:
 ```python
 import os
 
-SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-                          'mysql+pymysql://root:root@localhost:3306/restapi'
+SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'postgresql+psycopg2://root:root@localhost:5432/restapi'
 SQLALCHEMY_ECHO = True
 ```
 Πρέπει να υπάρχει έστω και κενό.

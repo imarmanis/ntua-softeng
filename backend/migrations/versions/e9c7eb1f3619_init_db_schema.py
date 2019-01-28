@@ -1,16 +1,17 @@
 """Init db schema
 
-Revision ID: 2851ebe8e028
+Revision ID: e9c7eb1f3619
 Revises: 
-Create Date: 2019-01-12 18:36:14.228182
+Create Date: 2019-01-25 18:46:44.246320
 
 """
 from alembic import op
 import sqlalchemy as sa
+import geoalchemy2
 
 
 # revision identifiers, used by Alembic.
-revision = '2851ebe8e028'
+revision = 'e9c7eb1f3619'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -28,8 +29,7 @@ def upgrade():
     )
     op.create_table('shop',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('lng', sa.Float(), nullable=False),
-    sa.Column('lat', sa.Float(), nullable=False),
+    sa.Column('position', geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326), nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('withdrawn', sa.Boolean(), nullable=False),
     sa.Column('address', sa.String(length=255), nullable=False),
@@ -51,22 +51,22 @@ def upgrade():
     sa.Column('date', sa.Date(), nullable=False),
     sa.Column('product_id', sa.Integer(), nullable=False),
     sa.Column('shop_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['product_id'], ['product.id'], ),
-    sa.ForeignKeyConstraint(['shop_id'], ['shop.id'], ),
+    sa.ForeignKeyConstraint(['product_id'], ['product.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['shop_id'], ['shop.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('productTag',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=128), nullable=False),
     sa.Column('product_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['product_id'], ['product.id'], ),
+    sa.ForeignKeyConstraint(['product_id'], ['product.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('shopTag',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=128), nullable=False),
     sa.Column('shop_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['shop_id'], ['shop.id'], ),
+    sa.ForeignKeyConstraint(['shop_id'], ['shop.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

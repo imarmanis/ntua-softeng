@@ -80,7 +80,7 @@ class ProductsResource(Resource):
         product = Product(name=args['name'], description=args['description'],
                           category=args['category'], withdrawn=False)
         product.tags = [ProductTag(name=tag, product=product) for tag in
-                        args['tags'] if tag.strip()] # ignore blank tags
+                        args['tags'] if tag.strip()]  # ignore blank tags
         db.session.add(product)
         db.session.commit()
 

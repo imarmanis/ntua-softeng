@@ -7,6 +7,9 @@ from marshmallow import validate
 from marshmallow.decorators import post_dump, pre_dump
 from app.models import Product, Shop, Price, db, ma, ProductTag, ShopTag
 from sqlalchemy import asc, desc, func, or_
+from geoalchemy2.shape import from_shape
+from shapely.geometry import Point
+
 
 SORT_CHOICE = list(map('|'.join, itertools.product(['geoDist', 'price', 'date'],
                                                    ['ASC', 'DESC'])))
@@ -103,11 +106,12 @@ class PricesResource(Resource):
 
         # extra validation, some combinations are illegal
 
+        dist_col = None
         if with_geo:
-            dist = Shop.distance(args['geoLat'], args['geoLng']).label('dist')
+            dist = func.ST_Distance(Shop.position, from_shape(Point(args['geoLng'], args['geoLat']), srid=4326), True).\
+                label('dist')
             query = db.session.query(Price, dist)
         else:
-            dist = None
             query = Price.query
 
         query = query.join(Price.product, Price.shop)
@@ -127,12 +131,13 @@ class PricesResource(Resource):
 
         if with_geo:
             subq = query.subquery()
-            query = db.session.query(Price, subq.c.dist).select_entity_from(subq).filter(subq.c.dist < args['geoDist'])
+            dist_col = subq.c.dist
+            query = db.session.query(Price, dist_col).select_entity_from(subq).filter(dist_col < args['geoDist'])
             # nested query to avoid recalculating distance expr
             # WHERE and HAVING clauses can't refer to column names (dist)
 
         sort_field = {
-            'geoDist': dist,
+            'geoDist': dist_col,
             'price': Price.price,
             'date': Price.date
         }[sort[0]]
