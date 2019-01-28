@@ -74,3 +74,12 @@ SQLALCHEMY_ECHO = True
 `flask run`
 
 Για δοκιμή των HTTP methods υπάρχει το Postman
+
+### HTTPS
+
+Στο secrets/ πρέπει να υπάρχουν τα αρχεία {cert, key}.pem για
+το self-signed certificate και το private key.
+Δημιουργία πχ με:
+```bash
+openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
+```
