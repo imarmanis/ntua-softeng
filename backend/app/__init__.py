@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from config import Config
 
 
@@ -13,4 +14,5 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     from app.resources import api
     api.init_app(app)
+    CORS(app)
     return app
