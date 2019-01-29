@@ -1,7 +1,7 @@
 from functools import wraps
 from secrets import token_urlsafe
 from flask import request
-from marshmallow import fields
+from marshmallow import fields, validate
 from webargs.flaskparser import use_args
 from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
@@ -36,15 +36,13 @@ def _login(user):
     :param user: an User instance already in the db, but not already logged in
         (user.token should be None).
     '''
-    ready = False
-    while not ready:
-        ready = True
+    while True:
         user.token = token_urlsafe(20)
         try:
             db.session.commit()
+            break
         except IntegrityError:
             db.session.rollback()
-            ready = False
             # token collision
 
 
@@ -59,25 +57,24 @@ class LogoutResource(Resource):
 class LoginResource(Resource):
     @use_args({
         'username': fields.Str(required=True, location='form'),
-        'password': fields.Str(required=True, location='form')
-        # Add format, like in the other resources, just to return bad request if it is XML?
+        'password': fields.Str(required=True, location='form'),
+        'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))
     })
     def post(self, args):
         user = User.query.filter(User.username == args['username']).first()
         if not (user and user.verify_password(args['password'])):
             return not_authorized
-        if user.token:
-            return bad_request
 
         _login(user)
 
         return {'token': user.token}
 
+
 class RegisterResource(Resource):
     @use_args({
         'username': fields.Str(required=True, location='form'),
-        'password': fields.Str(required=True, location='form')
-        # Add format, like in the other resources, just to return bad request if it is XML?
+        'password': fields.Str(required=True, location='form'),
+        'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))
     })
     def post(self, args):
         user = User(username=args['username'], password=args['password'])
@@ -88,7 +85,5 @@ class RegisterResource(Resource):
             # username is in use
             db.session.rollback()
             return bad_request
-
-        _login(user)
 
         return {'token': user.token}
