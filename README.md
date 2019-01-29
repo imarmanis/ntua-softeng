@@ -77,9 +77,23 @@ SQLALCHEMY_ECHO = True
 
 ### HTTPS
 
-Στο secrets/ πρέπει να υπάρχουν τα αρχεία {cert, key}.pem για
+Στο secret/ πρέπει να υπάρχουν τα αρχεία {cert, key}.pem για
 το self-signed certificate και το private key.
 Δημιουργία πχ με:
 ```bash
 openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
 ```
+
+## Επέκταση στο API
+- `POST {baseURL}/registration`
+
+Δημιουργία νέου χρήστη με ρόλο Εθελοντή. Το username πρέπει να μην ανήκει σε
+κανέναν υπάρχοντα χρήστη. Με την επιτυχή δημιουργία του, ο χρήστης επίσης
+συνδέεται. Επιστρέφεται το authentication token, όπως και στην περίπτωση του
+login. Υποστηριζόμενες παράμετροι ακριβώς όπως και για το login (στο request
+body):
+
+Όνομα | Περιγραφή
+----- | ---------
+username | String. Υποχρεωτικό. Το username του νέου χρήστη.
+password | String. Υποχρεωτικό. Το password του νέου χρήστη. 

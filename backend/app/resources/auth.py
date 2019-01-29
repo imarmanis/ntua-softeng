@@ -1,11 +1,11 @@
 from functools import wraps
+from secrets import token_urlsafe
 from flask import request
-from app.models import User, db
 from marshmallow import fields
 from webargs.flaskparser import use_args
 from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
-from secrets import token_urlsafe
+from app.models import User, db
 
 not_authorized = '', 403
 bad_request = '', 400
@@ -30,6 +30,24 @@ def requires_auth(f):
     return decorated
 
 
+def _login(user):
+    '''
+    Actually log the user in.
+    :param user: an User instance already in the db, but not already logged in
+        (user.token should be None).
+    '''
+    ready = False
+    while not ready:
+        ready = True
+        user.token = token_urlsafe(20)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            ready = False
+            # token collision
+
+
 class LogoutResource(Resource):
     @requires_auth
     def post(self, token, **_kwargs):
@@ -42,6 +60,7 @@ class LoginResource(Resource):
     @use_args({
         'username': fields.Str(required=True, location='form'),
         'password': fields.Str(required=True, location='form')
+        # Add format, like in the other resources, just to return bad request if it is XML?
     })
     def post(self, args):
         user = User.query.filter(User.username == args['username']).first()
@@ -50,16 +69,26 @@ class LoginResource(Resource):
         if user.token:
             return bad_request
 
-        ready = False
-        while not ready:
-            ready = True
-            token = token_urlsafe(20)
-            user.token = token
-            try:
-                db.session.commit()
-            except IntegrityError:
-                db.session.rollback()
-                ready = False
-                # token collision
+        _login(user)
+
+        return {'token': user.token}
+
+class RegisterResource(Resource):
+    @use_args({
+        'username': fields.Str(required=True, location='form'),
+        'password': fields.Str(required=True, location='form')
+        # Add format, like in the other resources, just to return bad request if it is XML?
+    })
+    def post(self, args):
+        user = User(username=args['username'], password=args['password'])
+        db.session.add(user)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            # username is in use
+            db.session.rollback()
+            return bad_request
+
+        _login(user)
 
         return {'token': user.token}

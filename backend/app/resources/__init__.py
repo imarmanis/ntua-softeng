@@ -3,7 +3,7 @@ from webargs.flaskparser import parser, abort
 from app.resources.products import ProductsResource, ProductResource
 from app.resources.prices import PricesResource
 from app.resources.shops import ShopsResource, ShopResource
-from app.resources.auth import LoginResource, LogoutResource
+from app.resources.auth import LoginResource, LogoutResource, RegisterResource
 
 
 @parser.error_handler
@@ -19,3 +19,4 @@ api.add_resource(ShopsResource, '/shops')
 api.add_resource(ShopResource, '/shops/<int:shop_id>')
 api.add_resource(LoginResource, '/login')
 api.add_resource(LogoutResource, '/logout')
+api.add_resource(RegisterResource, '/register')
