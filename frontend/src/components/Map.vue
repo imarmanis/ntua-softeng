@@ -1,5 +1,5 @@
 <template>
-  <div id="myMap">
+  <div id="map">
     <l-map :zoom="zoom" :center="center"
     @contextmenu="rightClick">
       <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { LMap, LTileLayer, LMarker, LPopup } from 'vue2-leaflet';
+import { L, LMap, LTileLayer, LMarker, LPopup } from 'vue2-leaflet';
 import { bus } from '../main'
 
 export default {
@@ -43,7 +43,7 @@ export default {
 </script>
 
 <style scoped>
-#myMap {
+#map {
   height: 380px;
   width: 600px;
   margin: 0;

@@ -31,14 +31,14 @@
                  πάνω στον χάρτη:</label>
               <myMap></myMap>
               <p>
-                <input type="submit" value="Προσθήκη"></input>
+                <input type="submit" value="Προσθήκη">
               </p>
           </form>
     </div>
 </template>
 
 <script>
-import myMap from './myMap.vue'
+import myMap from '../components/Map.vue'
 import { bus } from '../main'
 export default {
   components:{
@@ -70,7 +70,6 @@ export default {
                     }, {
                       emulateJSON: true
                   }).then(function(data){
-                        console.log(data)
                         alert("Ευχαριστούμε για την προσθήκη ενός νέου καταστήματος!");
                         this.doReset();
                         return;
