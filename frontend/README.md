@@ -4,10 +4,7 @@
 ## Project setup
 ```
 npm install
-cp el.js ./node_modules/vee-validate/dist/locale/el.js
 ```
-
-After installing dependencies overwrite " file with "./el.js"
 
 ### Compiles and hot-reloads for development
 ```
