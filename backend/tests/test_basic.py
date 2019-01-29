@@ -13,15 +13,24 @@ def valid_response(real_data, json):
             assert real_data[attr] == json[attr]
 
 
-@pytest.mark.usefixtures("user1", "root")
 class TestBasic(object):
-    def test_login(self, client, user1):
+    @pytest.mark.parametrize("user_data", data.users)
+    def test_register(self, client, user_data):
+        rv = client.post(
+            url_for('/register'),
+            data=user_data
+        )
+
+        assert rv.status_code == 200
+        assert User.query.filter(User.username == user_data['username']).first() is not None
+
+    def test_login(self, client, user1, user1_token):
         rv = client.post(url_for('/login'))
         assert rv.status_code == 400
 
         rv = client.post(url_for('/login'), data=user1)
         assert rv.status_code == 200
-        assert rv.json['token'] == User.query.filter(User.username == user1['username']).first().token
+        assert rv.json['token'] == user1_token
 
     @pytest.mark.parametrize("product_data", data.products)
     def test_add_product(self, client, product_data, user1_token):
@@ -164,13 +173,12 @@ class TestBasic(object):
         assert rv.status_code == 200
         assert rv.json['message'] == "OK"
 
-    def test_logout(self, client, user1):
-        token = User.query.filter(User.username == user1['username']).first().token
+    def test_logout(self, client, user1, user1_token):
 
         rv = client.post(url_for('/logout'))
         assert rv.status_code == 403
 
-        rv = client.post(url_for('/logout'), headers=auth_header(token))
+        rv = client.post(url_for('/logout'), headers=auth_header(user1_token))
 
         assert rv.status_code == 200
         assert not User.query.filter(User.username == user1['username']).first().token

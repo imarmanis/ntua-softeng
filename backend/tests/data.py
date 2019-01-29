@@ -1,9 +1,8 @@
-root = {
-    'username': 'root',
-    'password': 'root'
-}
-
 users = [
+    {
+        'username': 'root',
+        'password': 'root'
+    },
     {
         'username': 'foo',
         'password': 'bar'
