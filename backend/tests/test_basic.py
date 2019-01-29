@@ -24,13 +24,13 @@ class TestBasic(object):
         assert rv.status_code == 200
         assert User.query.filter(User.username == user_data['username']).first() is not None
 
-    def test_login(self, client, user1, user1_token):
+    def test_login(self, client, user1):
         rv = client.post(url_for('/login'))
         assert rv.status_code == 400
 
         rv = client.post(url_for('/login'), data=user1)
         assert rv.status_code == 200
-        assert rv.json['token'] == user1_token
+        assert rv.json['token'] == User.query.filter(User.username == data.users[1]['username']).first().token
 
     @pytest.mark.parametrize("product_data", data.products)
     def test_add_product(self, client, product_data, user1_token):
