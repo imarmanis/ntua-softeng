@@ -96,7 +96,9 @@ export default {
                     dateTo: this.price.dateTo,
                     productId: this.price.productId,
                     shopId: this.price.shopId,
-                    }).then(function(data){
+                    }, {
+                      emulateJSON: true
+                  }).then(function(data){
                         alert("Ευχαριστούμε για την προσθήκη μιας νέας τιμής!");
                         this.doReset();
                         return;
@@ -117,7 +119,7 @@ export default {
       this.shops = [];
       this.products = [];
       this.shopIds = [];
-      this.productIds = [],
+      this.productIds = [];
       this.productNames = [];
       this.shopNames = [];
     },
@@ -133,7 +135,7 @@ export default {
 
     this.$http.get('https://localhost:8765/observatory/api/products').then(function(data){
           //products list
-         this.products = data.products;
+         this.products = data.body.products;
          if(this.products){
             this.productIds = this.products.map(function(temp) {
                 return temp['id'];  });
@@ -143,7 +145,7 @@ export default {
       });
      this.$http.get('https://localhost:8765/observatory/api/shops').then(function(data){
           //shops list
-         this.shops = data.shops;
+         this.shops = data.body.shops;
          if(this.shops){
             this.shopIds = this.shops.map(function(temp) {
                 return temp['id'];  });

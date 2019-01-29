@@ -67,7 +67,9 @@ export default {
                       return tag['text'];  }),
                     lat: this.shop.lat,
                     lng: this.shop.lng
-                    }).then(function(data){
+                    }, {
+                      emulateJSON: true
+                  }).then(function(data){
                         console.log(data)
                         alert("Ευχαριστούμε για την προσθήκη ενός νέου καταστήματος!");
                         this.doReset();

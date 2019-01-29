@@ -62,7 +62,9 @@ export default {
                     category: this.product.category,
                     tags: this.product.tags.map(function(tag) {
                       return tag['text'];  }),
-                    }).then(function(data){
+                    }, {
+                      emulateJSON: true
+                  }).then(function(data){
                         alert("Ευχαριστούμε για την προσθήκη ενός νέου προϊόντος!");
                         this.doReset();
                         return;
