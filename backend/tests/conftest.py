@@ -25,5 +25,3 @@ def user1_token():
 @pytest.fixture(scope="module")
 def user1():
     return data.users[1]
-
-

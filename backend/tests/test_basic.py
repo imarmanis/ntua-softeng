@@ -16,13 +16,18 @@ def valid_response(real_data, json):
 class TestBasic(object):
     @pytest.mark.parametrize("user_data", data.users)
     def test_register(self, client, user_data):
-        rv = client.post(
-            url_for('/register'),
-            data=user_data
-        )
-
+        rv = client.post(url_for('/register'))
+        assert rv.status_code == 400
+        
+        rv = client.post(url_for('/register'), data=user_data)
         assert rv.status_code == 200
         assert User.query.filter(User.username == user_data['username']).first() is not None
+        assert User.query.filter(User.username == user_data['username']).first().verify_password(user_data['password'])
+        assert User.query.filter(User.username == user_data['username']).first().is_admin == False
+        assert User.query.filter(User.username == user_data['username']).first().token is None
+
+        rv = client.post(url_for('/register'), data=user_data)
+        assert rv.status_code == 400
 
     def test_login(self, client, user1):
         rv = client.post(url_for('/login'))
