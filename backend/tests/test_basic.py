@@ -157,7 +157,7 @@ class TestBasic(object):
         assert rv.status_code == 200
         valid_response(data.shops[1], rv.json)
 
-    def test_path_shop(self, client, user1_token):
+    def test_patch_shop(self, client, user1_token):
         shop2patch = data.shops[1].copy()
         shop2patch.update({'lat': 99})
         rv = client.patch(

@@ -54,7 +54,7 @@ Tα βασικά στο config.py.
 
 Στο instance/config.py (μένει εκτός git) βάζει ο καθένας τα δικά του, θα κάνουν override το config.py.
 
-Πχ το instance/config.py για postgreSQ:
+Πχ το instance/config.py για postgreSQL:
 ```python
 import os
 
