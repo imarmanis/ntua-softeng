@@ -95,3 +95,17 @@ openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 36
 ----- | ---------
 username | String. Υποχρεωτικό. Το username του νέου χρήστη.
 password | String. Υποχρεωτικό. Το password του νέου χρήστη. 
+
+## Continuous Integration
+Χρησιμοποιούμε το [Jenkins](https://jenkins.io/) τοπικά.
+### Plugins
+Απαραίτητα τα:
+- [Git](https://wiki.jenkins.io/display/JENKINS/Git+Plugin)
+- [Pipeline](https://wiki.jenkins.io/display/JENKINS/Pipeline+Plugin)
+### Setup
+[Jenkins Dashboard] -> [New Item] -> Pipeline  
+-> [Pipeline] -> [Definition] -> Pipeline script from SCM  
+-> [SCM] -> Git
+-> [Repositories] -> [Repository URL] -> file:///absolute/path/to/local/repo
+-> [Branches to build] -> */* για να παρακολουθεί όλα τα branches
+Το `Jenkinsfile` φροντίζει για τα υπόλοιπα. Παρακολουθεί το (τοπικό) repo και κάνει integration εντός 1' από κάθε νέο commit.
