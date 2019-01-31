@@ -19,6 +19,10 @@ class Price(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('product.id', ondelete="CASCADE"), nullable=False)
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id', ondelete="CASCADE"), nullable=False)
 
+    __table_args__ = (
+        db.UniqueConstraint('product_id', 'shop_id', 'date', name="price_psd_c"),
+    )
+
 
 class Product(db.Model):
     __tablename__ = 'product'
@@ -41,6 +45,10 @@ class ProductTag(db.Model):
     name = db.Column(db.String(128), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id', ondelete="CASCADE"), nullable=False)
 
+    __table_args__ = (
+        db.UniqueConstraint('product_id', 'name', name="productTag_id_name_c"),
+    )
+
 
 class Shop(db.Model):
     __tablename__ = 'shop'
@@ -55,6 +63,10 @@ class Shop(db.Model):
     withdrawn = db.Column(db.Boolean, nullable=False, default=False)
     address = db.Column(db.String(255), nullable=False)
 
+    __table_args__ = (
+        db.UniqueConstraint('position', 'name', 'address', name="shop_pna_c"),
+    )
+
 
 class ShopTag(db.Model):
     __tablename__ = 'shopTag'
@@ -62,6 +74,10 @@ class ShopTag(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(128), nullable=False)
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id', ondelete="CASCADE"), nullable=False)
+
+    __table_args__ = (
+        db.UniqueConstraint('shop_id', 'name', name="shopTag_id_name_c"),
+    )
 
 
 class User(db.Model):

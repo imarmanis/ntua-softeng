@@ -5,6 +5,7 @@ import marshmallow
 from marshmallow import validate, post_dump
 from app.models import db, ma, Product, ProductTag
 from app.resources.auth import requires_auth
+from sqlalchemy.exc import IntegrityError
 
 
 class ProductTagSchema(ma.ModelSchema):
@@ -63,7 +64,7 @@ class ProductsResource(Resource):
         products = query.order_by(sort).offset(start).limit(count).all()
 
         return {
-            'start': min(start, total), # rows skipped due to offset
+            'start': min(start, total),  # rows skipped due to offset
             'count': len(products),
             'total': total,
             'products': prod_schema.dump(products, many=True).data
@@ -83,7 +84,11 @@ class ProductsResource(Resource):
         product.tags = [ProductTag(name=tag, product=product) for tag in
                         args['tags'] if tag.strip()]  # ignore blank tags
         db.session.add(product)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return {'errors': {"Tags": "Duplicate tags"}}, 400
 
         return prod_schema.dump(product).data
 
@@ -112,10 +117,16 @@ class ProductResource(Resource):
         product.category = args['category']
         for tag in product.tags:
             db.session.delete(tag)  # delete old product tags
+        db.session.flush()
+        # flush delete's to db to ensure delete stmts precedes insert stmt and avoid integrity error
         product.tags = [ProductTag(name=tag, product=product) for tag in
                         args['tags'] if tag.strip()]   # ignore blank tags
 
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return {'errors': {"Tags": "Duplicate tags"}}, 400
 
         return prod_schema.dump(product).data
 
@@ -136,11 +147,17 @@ class ProductResource(Resource):
         if changed == 'tags':
             for tag in product.tags:
                 db.session.delete(tag)  # delete old product tags
+            db.session.flush()
             product.tags = [ProductTag(name=tag, product=product) for tag in
                             args['tags'] if tag.strip()]    # ignore blank tags
         else:
             setattr(product, changed, args[changed])
-        db.session.commit()
+
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return {'errors': {"Tags": "Duplicate tags"}}, 400
 
         return prod_schema.dump(product).data
 

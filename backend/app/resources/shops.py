@@ -8,7 +8,7 @@ from app.models import Shop, ShopTag, db, ma
 from app.resources.auth import requires_auth
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import Point
-
+from sqlalchemy.exc import IntegrityError
 
 SORT_CHOICE = list(map('|'.join, itertools.product(['name', 'id'],
                                                    ['ASC', 'DESC'])))
@@ -71,7 +71,7 @@ class ShopsResource(Resource):
         shops_page = query.offset(start).limit(count).all()
         shops = shop_schema.dump(shops_page, many=True).data
         return {
-            'start': min(start, total), # rows skipped due to offset
+            'start': min(start, total),  # rows skipped due to offset
             'count': len(shops_page),
             'total': total,
             'shops': shops
@@ -91,7 +91,14 @@ class ShopsResource(Resource):
         new_shop = Shop(name=args['name'], address=args['address'], position=position, withdrawn=False)
         new_shop.tags = [ShopTag(name=tag, shop=new_shop) for tag in args['tags'] if tag.strip()]
         db.session.add(new_shop)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError as e:
+            db.session.rollback()
+            if "shop_pna_c" in e.orig:
+                return {'errors': {"Address/Position/Name": "Same address, position, name with existing shop"}}, 400
+            else:
+                return {'errors': {"Tags": "Duplicate tags"}}, 400
         return shop_schema.dump(new_shop).data
 
 
@@ -119,8 +126,18 @@ class ShopResource(Resource):
         shop.position = from_shape(Point(args['lng'], args['lat']), srid=4326)
         for tag in shop.tags:
             db.session.delete(tag)
+        try:
+            db.session.flush()
+        except IntegrityError:
+            db.session.rollback()
+            return {'errors': {"Address/Position/Name": "Same address, position and name with existing shop"}}, 400
+        # flush delete's to db to ensure delete stmts precede insert stmt and avoid integrity error
         shop.tags = [ShopTag(name=tag, shop=shop) for tag in args['tags'] if tag.strip()]
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return {'errors': {"Tags": "Duplicate tags"}}, 400
         return shop_schema.dump(shop).data
  
     @requires_auth
@@ -141,6 +158,7 @@ class ShopResource(Resource):
         if changed == 'tags':
             for tag in shop.tags:
                 db.session.delete(tag)
+            db.session.flush()
             shop.tags = [ShopTag(name=tag, shop=shop) for tag in args['tags'] if tag.strip()]
         elif changed == 'lat':
             old = to_shape(shop.position)
@@ -151,7 +169,16 @@ class ShopResource(Resource):
             shop.position = from_shape(Point(args['lng'], old.y), srid=4326)
         else:
             setattr(shop, changed, args[changed])
-        db.session.commit()
+
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            if changed == 'tags':
+                return {'errors': {"Tags": "Duplicate tags"}}, 400
+            else:
+                return {'errors': {"Address/Position/Name": "Same address, position and name with existing shop"}}, 400
+
         return ShopSchema().dump(shop).data
  
     @requires_auth

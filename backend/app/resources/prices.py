@@ -7,6 +7,7 @@ from marshmallow import validate
 from marshmallow.decorators import post_dump, pre_dump
 from app.models import Product, Shop, Price, db, ma, ProductTag, ShopTag
 from sqlalchemy import asc, desc, func, or_
+from sqlalchemy.dialects.postgresql import insert
 from geoalchemy2.shape import from_shape
 from shapely.geometry import Point
 
@@ -155,7 +156,7 @@ class PricesResource(Resource):
         prices_page = query.offset(start).limit(count).all()
         prices = PricesResource.PriceSchema(many=True).dump(prices_page).data
         return {
-            'start': min(start, total), # rows skipped due to offset
+            'start': min(start, total),  # rows skipped due to offset
             'count': len(prices_page),
             'total': total,
             'prices': prices
@@ -183,11 +184,16 @@ class PricesResource(Resource):
         del args['dateFrom']
         del args['dateTo']
 
-        new_prices = [Price(**args, date=d) for d in
-                      [date1 + timedelta(days=x) for x in range((date2-date1).days + 1)]]
-        db.session.add_all(new_prices)
+        for d in [date1 + timedelta(days=x) for x in range((date2-date1).days + 1)]:
+            new_price = dict(**args, date=d)
+            upsert = insert(Price).values(new_price).on_conflict_do_update(
+                constraint="price_psd_c",
+                set_=new_price)
+            db.session.execute(upsert)
         db.session.commit()
-        # TODO
-        # UniqueConstraint on (shop_id, product_id, date) necessary ?
-        # Maybe use '~ INSERT [] ON DUPLICATE KEY UPDATE' dbms specific statement
+        new_prices = Price.query.filter(
+            Price.product_id == args['product_id'],
+            Price.shop_id == args['shop_id'],
+            Price.date.between(date1, date2)
+        ).all()
         return PricesResource.PriceSchema(many=True).dump(new_prices).data

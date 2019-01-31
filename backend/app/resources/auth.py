@@ -85,5 +85,3 @@ class RegisterResource(Resource):
             # username is in use
             db.session.rollback()
             return bad_request
-
-        return {'token': user.token}
