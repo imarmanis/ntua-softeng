@@ -1,25 +1,26 @@
 <template>
-  <div>
-     <app-header></app-header>
-     <router-view></router-view>
+  <div id="app">
+    <app-header/>
+    <router-view/>
   </div>
 </template>
 
 <script>
-// Imports
-import homepage from './components/home.vue';
-import addShop from './components/addShop.vue';
-import addProduct from './components/addProduct.vue';
-import addPrice from './components/addPrice.vue';
-import header from './components/header.vue';
+  import Header from './components/Header';
 
-export default {
-  components:{
-      'app-header': header,
-  },
-}
+  export default {
+    components: {
+      'app-header': Header
+    }
+  }
 </script>
 
 <style>
-
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
 </style>

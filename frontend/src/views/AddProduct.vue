@@ -30,7 +30,7 @@
               @tags-changed="newTags => product.tags = newTags"
               />
               <p>
-                <input type="submit" value="Προσθήκη"></input>
+                <input type="submit" value="Προσθήκη">
               </p>
           </form>
     </div>
