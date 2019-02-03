@@ -1,6 +1,6 @@
 <template>
   <div>
-  <div id="app">
+  <div id="app" :class="[{'collapsed' :collapsed}]">
     <app-sidebar/>
   </div>    
   <div id="app"> 

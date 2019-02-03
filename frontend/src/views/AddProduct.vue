@@ -56,15 +56,19 @@ export default {
     post: function(){
       this.$validator.validateAll().then(valid => {
                 if (valid) {
-                  this.$http.post('https://localhost:8765/observatory/api/products', {
+                  this.$http.post(
+                   'https://localhost:8765/observatory/api/products', 
+                    {
                     name: this.product.name,
                     description: this.product.description,
                     category: this.product.category,
                     tags: this.product.tags.map(function(tag) {
                       return tag['text'];  }),
-                    }, {
-                      emulateJSON: true
-                  }).then(function(data){
+                    },
+                    {headers: {'X-OBSERVATORY-AUTH': this.$store.getters.token},
+                    params,
+                    emulateJSON: true}
+                    ).then(function(){
                         alert("Ευχαριστούμε για την προσθήκη ενός νέου προϊόντος!");
                         this.doReset();
                         return;
