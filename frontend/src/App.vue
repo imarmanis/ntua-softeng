@@ -1,16 +1,20 @@
 <template>
+  <div>
   <div id="app">
-    <app-header/>
-    <router-view/>
+    <app-sidebar/>
+  </div>    
+  <div id="app"> 
+  <router-view/>
+  </div>
   </div>
 </template>
 
 <script>
-  import Header from './components/Header';
+  import Sidebar from './components/Sidebar';
 
   export default {
     components: {
-      'app-header': Header
+      'app-sidebar': Sidebar
     }
   }
 </script>
@@ -23,4 +27,5 @@
   text-align: center;
   color: #2c3e50;
 }
+
 </style>

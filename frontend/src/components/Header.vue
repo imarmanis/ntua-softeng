@@ -5,7 +5,9 @@
             <li><router-link to="/addshop" exact>Νέο Κατάστημα</router-link></li>
             <li><router-link to="/addproduct" exact>Νέο προϊόν</router-link></li>
             <li><router-link to="/addprice" exact>Νέα τιμή</router-link></li>
-        </ul>
+            <li><router-link to="/register" exact>Εγγραφή</router-link></li>
+            <li><router-link to="/login" exact>Login</router-link></li>
+      </ul>
     </nav>
 </template>
 
