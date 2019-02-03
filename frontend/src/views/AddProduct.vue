@@ -66,7 +66,6 @@ export default {
                       return tag['text'];  }),
                     },
                     {headers: {'X-OBSERVATORY-AUTH': this.$store.getters.token},
-                    params,
                     emulateJSON: true}
                     ).then(function(){
                         alert("Ευχαριστούμε για την προσθήκη ενός νέου προϊόντος!");
