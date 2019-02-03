@@ -30,12 +30,9 @@ export default new Vuex.Store({
                 Vue.http.post('https://localhost:8765/observatory/api/login', creds, {emulateJSON: true}).then(response => {
                     const token = response.data.token
                     const user = creds.username    
-                    alert(token)
                     localStorage.setItem('token', token)
                     localStorage.setItem('user', user)
-                    alert(token)
                     commit("login",{token:token,user:user})
-                    alert(this.getters.user)
                     resolve(response)
                 })
                 .catch( err => { reject(err)})
