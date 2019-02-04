@@ -37,6 +37,8 @@
 </template>
 
 <script>
+import Axios from 'axios'
+import qs from 'qs'
 export default {
   components:{
 
@@ -56,18 +58,21 @@ export default {
     post: function(){
       this.$validator.validateAll().then(valid => {
                 if (valid) {
-                  this.$http.post(
+                  Axios.post(
                    'https://localhost:8765/observatory/api/products', 
-                    {
+                    qs.stringify({
                     name: this.product.name,
                     description: this.product.description,
                     category: this.product.category,
                     tags: this.product.tags.map(function(tag) {
                       return tag['text'];  }),
+                    },{arrayFormat :'repeat'}),
+                    {headers: {
+                    'X-OBSERVATORY-AUTH': this.$store.getters.token,
+                    'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    {headers: {'X-OBSERVATORY-AUTH': this.$store.getters.token},
                     emulateJSON: true}
-                    ).then(function(){
+                    ).then(()=>{
                         alert("Ευχαριστούμε για την προσθήκη ενός νέου προϊόντος!");
                         this.doReset();
                         return;
