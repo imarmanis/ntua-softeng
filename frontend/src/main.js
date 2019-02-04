@@ -5,20 +5,19 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import VueResource from 'vue-resource'
 import VeeValidate, { Validator }  from 'vee-validate'
 import { L } from 'vue2-leaflet'
 import 'leaflet/dist/leaflet.css'
 import VueTagsInput from '@johmun/vue-tags-input'
 import el from 'vee-validate/dist/locale/el'
+import './plugins/axios'
 
 Vue.config.productionTip = false;
 
 
 Vue.use(VeeValidate, {locale: 'el'});
 // Use packages
-Vue.use(VueSidebarMenu)
-Vue.use(VueResource);
+Vue.use(VueSidebarMenu);
 Vue.use(VueTagsInput);
 Validator.localize({ el: el });
 

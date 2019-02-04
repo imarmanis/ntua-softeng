@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import qs from 'qs';
 import myMap from '../components/Map.vue'
 import { bus } from '../main'
 export default {
@@ -58,24 +59,28 @@ export default {
   },
   methods:{
     post: function(){
-      this.$validator.validateAll().then(valid => {
-                if (valid) {
-                  this.$http.post('https://localhost:8765/observatory/api/shops', {
-                    name: this.shop.name,
-                    address: this.shop.address,
-                    tags: this.shop.tags.map(function(tag) {
-                      return tag['text'];  }),
-                    lat: this.shop.lat,
-                    lng: this.shop.lng
-                    }, {
-                      emulateJSON: true
-                  }).then(function(data){
-                        alert("Ευχαριστούμε για την προσθήκη ενός νέου καταστήματος!");
-                        this.doReset();
-                        return;
-                    });
-                }
-      });
+        this.$validator.validateAll().then(valid => {
+            if (valid) {
+                this.$axios.post('/shops',
+                    qs.stringify(
+                        {
+                            name: this.shop.name,
+                            address: this.shop.address,
+                            tags: this.shop.tags.map(function(tag) {
+                                return tag['text'];  }),
+                            lat: this.shop.lat,
+                            lng: this.shop.lng
+                        },
+                        {
+                            arrayFormat :'repeat'
+                        }
+                    )
+                ).then(() => {
+                    alert("Ευχαριστούμε για την προσθήκη ενός νέου καταστήματος!");
+                    this.doReset();
+                });
+            }
+        });
   },
     doReset: function(){
       this.$validator.reset();

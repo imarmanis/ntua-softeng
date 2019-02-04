@@ -54,13 +54,14 @@
                   {{ errors.first('shop_name') }}
               </p>
               <p>
-                <input type="submit" value="Προσθήκη"></input>
+                <input type="submit" value="Προσθήκη">
               </p>
           </form>
     </div>
 </template>
 
 <script>
+import qs from 'qs';
 export default {
   components:{
 
@@ -85,27 +86,26 @@ export default {
     }
   },
   methods:{
-    post: function(){
-      this.$validator.validateAll().then(valid => {
-                if (valid) {
+      post: function(){
+          this.$validator.validateAll().then(valid => {
+              if (valid) {
                   this.price.productId = this.search(this.price.productName, this.products);
                   this.price.shopId = this.search(this.price.shopName, this.shops);
-                  this.$http.post('https://localhost:8765/observatory/api/prices', {
-                    price: this.price.cost,
-                    dateFrom: this.price.dateFrom,
-                    dateTo: this.price.dateTo,
-                    productId: this.price.productId,
-                    shopId: this.price.shopId,
-                    }, {
-                      emulateJSON: true
-                  }).then(function(data){
-                        alert("Ευχαριστούμε για την προσθήκη μιας νέας τιμής!");
-                        this.doReset();
-                        return;
-                    });
-                }
-            });
-    },
+                  this.$axios.post('/prices',
+                      qs.stringify({
+                          price: this.price.cost,
+                          dateFrom: this.price.dateFrom,
+                          dateTo: this.price.dateTo,
+                          productId: this.price.productId,
+                          shopId: this.price.shopId
+                      })
+                  ).then(() => {
+                      alert("Ευχαριστούμε για την προσθήκη μιας νέας τιμής!");
+                      this.doReset();
+                  });
+              }
+          });
+      },
     doReset: function(){
       this.$validator.reset();
       this.price.cost = null;
@@ -124,7 +124,7 @@ export default {
       this.shopNames = [];
     },
     search: function(nameKey, myArray){
-      for (var i=0; i < myArray.length; i++) {
+      for (let i=0; i < myArray.length; i++) {
           if (myArray[i].name === nameKey) {
               return myArray[i].id;
           }
@@ -133,9 +133,9 @@ export default {
   },
   created(){
 
-    this.$http.get('https://localhost:8765/observatory/api/products').then(function(data){
+    this.$axios.get('/products').then((response) => {
           //products list
-         this.products = data.body.products;
+         this.products = response.data.products;
          if(this.products){
             this.productIds = this.products.map(function(temp) {
                 return temp['id'];  });
@@ -143,9 +143,9 @@ export default {
                 return temp['name'];  });
          }
       });
-     this.$http.get('https://localhost:8765/observatory/api/shops').then(function(data){
+     this.$axios.get('/shops').then((response) => {
           //shops list
-         this.shops = data.body.shops;
+         this.shops = response.data.shops;
          if(this.shops){
             this.shopIds = this.shops.map(function(temp) {
                 return temp['id'];  });

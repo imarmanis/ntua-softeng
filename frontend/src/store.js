@@ -1,9 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import VueResource from 'vue-resource'
+import qs from 'qs'
 
-Vue.use(Vuex)
-Vue.use(VueResource)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
@@ -27,25 +26,27 @@ export default new Vuex.Store({
     actions: {
         login ({commit},creds) {
             return new Promise((resolve,reject) =>{
-                Vue.http.post('https://localhost:8765/observatory/api/login', creds, {emulateJSON: true}).then(response => {
+                Vue.axios.post('/login', qs.stringify(creds)).then(response => {
                     const token = response.data.token
-                    const user = creds.username    
+                    const user = creds.username
                     localStorage.setItem('token', token)
                     localStorage.setItem('user', user)
                     commit("login",{token:token,user:user})
                     resolve(response)
                 })
-                .catch( err => { reject(err)})
+                    .catch( err => { reject(err)})
 
             })
         },
         logout ({commit}) {
             return new Promise((resolve) =>{
+                Vue.axios.post('/logout').then(() => {
                     localStorage.removeItem('token')
                     localStorage.removeItem('user')
                     commit('logout')
                     resolve()
                 })
+            })
         }
     },
     getters: {
