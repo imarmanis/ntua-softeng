@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import qs from 'qs';
 export default {
   components:{
 
@@ -43,22 +44,21 @@ export default {
     }
   },
   methods:{
-    post: function(){
-      this.$validator.validateAll().then(valid => {
-                if (valid) {
-                  this.$http.post('https://localhost:8765/observatory/api/register', {
-                    username: this.user.name,
-                    password: this.user.password,
-                    }, {
-                      emulateJSON: true
-                  }).then(function(){
-                        alert("Ευχαριστούμε για την προσθήκη ενός νέου χρήστη!");
-                        this.doReset();
-                        return;
-                    });
-                }
-            });
-    },
+      post: function(){
+          this.$validator.validateAll().then(valid => {
+              if (valid) {
+                  this.$axios.post('/register',
+                      qs.stringify({
+                          username: this.user.name,
+                          password: this.user.password,
+                      })
+                  ).then(() => {
+                      alert("Ευχαριστούμε για την προσθήκη ενός νέου χρήστη!");
+                      this.doReset();
+                  });
+              }
+          });
+      },
     doReset: function(){
       this.$validator.reset();
       this.user.name = null;
