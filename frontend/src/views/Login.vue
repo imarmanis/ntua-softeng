@@ -3,23 +3,25 @@
           <form @submit.prevent="login" >
               <h2>Login χρήστη</h2>
               <label>Όνομα</label>
-              <input name="u_name" type="text"
-                  v-validate="'required'"
-                  data-vv-as="*Το πεδίο"
-                  v-model="user.name" />
+              <label>
+                  <input name="u_name" type="text"
+                      v-validate="'required'"
+                      data-vv-as="*Το πεδίο"
+                      v-model="user.name" />
+              </label>
               <span
-                  style="color:red"
-                  v-show="errors.has('u_name')">
+                  style="color:red">
                   {{ errors.first('u_name') }}
               </span>
               <label>Κωδικός</label>
-              <input name="u_password" type="text"
-                  v-validate="'required'"
-                  data-vv-as="*Το πεδίο"
-                  v-model="user.password" />
+              <label>
+                  <input name="u_password" type="text"
+                      v-validate="'required'"
+                      data-vv-as="*Το πεδίο"
+                      v-model="user.password" />
+              </label>
               <span
-                  style="color:red"
-                  v-show="errors.has('u_password')">
+                  style="color:red">
                   {{ errors.first('u_password') }}
               </span>
               <p>

@@ -3,23 +3,27 @@
           <form @submit.prevent="post">
               <h2>Προσθήκη Νέου Προϊόντος</h2>
               <label>Όνομα καυσίμου:</label>
-              <input name="p_name" type="text"
-                  v-validate="'required'"
-                  data-vv-as="*Το πεδίο"
-                  v-model="product.name" />
-              <span
-                  v-show="errors.has('p_name')">
+              <label>
+                  <input name="p_name" type="text"
+                      v-validate="'required'"
+                      data-vv-as="*Το πεδίο"
+                      v-model="product.name" />
+              </label>
+              <span>
                   {{ errors.first('p_name') }}
               </span>
               <label>Περιγραφή:</label>
-              <textarea v-model.lazy="product.description"></textarea>
+              <label>
+                  <textarea v-model.lazy="product.description"></textarea>
+              </label>
               <label>Κατηγορία:</label>
-              <input name="p_category" type="text"
-                  v-validate="'required'"
-                  data-vv-as="*Το πεδίο"
-                  v-model="product.category" />
-              <span
-                  v-show="errors.has('p_category')">
+              <label>
+                  <input name="p_category" type="text"
+                      v-validate="'required'"
+                      data-vv-as="*Το πεδίο"
+                      v-model="product.category" />
+              </label>
+              <span>
                   {{ errors.first('p_category') }}
               </span>
               <label>Ετικέτες:</label>
@@ -64,11 +68,7 @@ export default {
                             name: this.product.name,
                             description: this.product.description,
                             category: this.product.category,
-                            tags: this.product.tags.map(
-                                function(tag) {
-                                    return tag['text'];
-                                }
-                            )
+                            tags: this.product.tags.map((tag) => tag['text'])
                         },
                         {
                             arrayFormat :'repeat'

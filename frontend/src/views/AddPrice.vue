@@ -3,56 +3,59 @@
           <form @submit.prevent="post">
               <h2>Προσθήκη τιμής</h2>
               <label>Τιμή(€):</label>
-              <input name="price" type="text"
-                  v-validate="'required|decimal:2|min_value:0.01'"
-                  data-vv-as="*Το πεδίο"
-                  v-model="price.cost" />
-              <span
-                  v-show="errors.has('price')">
-                  {{ errors.first('price') }}
-              </span>
+              <label>
+                  <input name="price" type="text"
+                      v-validate="'required|decimal:2|min_value:0.01'"
+                      data-vv-as="*Το πεδίο"
+                      v-model="price.cost" />
+              </label>
+              <span>{{ errors.first('price') }}</span>
               <h4>Χρονικό διάστημα που το προϊόν έχει την παραπάνω τιμή:</h4>
               <label>Ημερομηνία  από:</label>
-              <input name="date_from" type="text"
-                  v-validate="'required|date_format:YYYY/MM/DD'"
-                  ref="fromDate"
-                  data-vv-as="*Η ημερομηνία"
-                  v-model="price.dateFrom" />
-              <span
-                  v-show="errors.has('date_from')">
-                  {{ errors.first('date_from') }}
-              </span>
+              <label>
+                  <input name="date_from" type="text"
+                      v-validate="'required|date_format:YYYY/MM/DD'"
+                      ref="fromDate"
+                      data-vv-as="*Η ημερομηνία"
+                      v-model="price.dateFrom" />
+              </label>
+              <span>{{ errors.first('date_from') }}</span>
               <label>Ημερομηνία εώς:</label>
-              <input name="date_to" type="text"
-                  v-validate="'required|date_format:YYYY/MM/DD|after:fromDate,true'"
-                  data-vv-as="*Η ημερομηνία"
-                  v-model="price.dateTo" />
-              <span
-                  v-show="errors.has('date_to')">
-                  {{ errors.first('date_to') }}
-              </span>
+              <label>
+                  <input name="date_to" type="text"
+                      v-validate="'required|date_format:YYYY/MM/DD|after:fromDate,true'"
+                      data-vv-as="*Η ημερομηνία"
+                      v-model="price.dateTo" />
+              </label>
+              <span>{{ errors.first('date_to') }}</span>
               <label>Επέλεξε το προϊόν:</label>
-              <select v-model="price.productName"
-                  v-validate="'required'"
-                  name="product_name"
-                  data-vv-as="*Το πεδίο">
-                <option v-for="product in productNames">{{ product }}</option>
-              </select>
-              <p
-                  v-show="errors.has('product_name')">
-                  {{ errors.first('product_name') }}
-              </p>
+              <label>
+                  <select v-model="price.productId"
+                      v-validate="'required'"
+                      name="product_name"
+                      data-vv-as="*Το πεδίο">
+                    <option v-for="product in products"
+                            v-bind:value="product.id"
+                            v-bind:key="product.id">
+                        {{ product.name }}
+                    </option>
+                  </select>
+              </label>
+              <span>{{ errors.first('product_name') }}</span>
               <label>Επέλεξε το κατάστημα:</label>
-              <select v-model="price.shopName"
-                  v-validate="'required'"
-                  name="shop_name"
-                  data-vv-as="*Το πεδίο">
-                <option v-for="shop in shopNames">{{ shop }}</option>
-              </select>
-              <p
-                  v-show="errors.has('shop_name')">
-                  {{ errors.first('shop_name') }}
-              </p>
+              <label>
+                  <select v-model="price.shopId"
+                      v-validate="'required'"
+                      name="shop_name"
+                      data-vv-as="*Το πεδίο">
+                    <option v-for="shop in shops"
+                            v-bind:value="shop.id"
+                            v-bind:key="shop.id">
+                        {{ shop.name }}
+                    </option>
+                  </select>
+              </label>
+              <span>{{ errors.first('shop_name') }}</span>
               <p>
                 <input type="submit" value="Προσθήκη">
               </p>
@@ -72,25 +75,17 @@ export default {
         cost: null,
         dateFrom: null,
         dateTo: null,
-        productName: '',
-        shopName: '',
         productId: null,
         shopId: null,
       },
       shops: [],
       products: [],
-      shopIds: [],
-      productIds: [],
-      productNames: [],
-      shopNames: [],
     }
   },
   methods:{
       post: function(){
           this.$validator.validateAll().then(valid => {
               if (valid) {
-                  this.price.productId = this.search(this.price.productName, this.products);
-                  this.price.shopId = this.search(this.price.shopName, this.shops);
                   this.$axios.post('/prices',
                       qs.stringify({
                           price: this.price.cost,
@@ -111,47 +106,17 @@ export default {
       this.price.cost = null;
       this.price.dateFrom = null;
       this.price.dateTo = null;
-      this.price.productName = '';
-      this.price.shopName = [];
       this.price.productId = null;
       this.price.shopId = null;
-
-      this.shops = [];
-      this.products = [];
-      this.shopIds = [];
-      this.productIds = [];
-      this.productNames = [];
-      this.shopNames = [];
-    },
-    search: function(nameKey, myArray){
-      for (let i=0; i < myArray.length; i++) {
-          if (myArray[i].name === nameKey) {
-              return myArray[i].id;
-          }
-      }
-    },
+    }
   },
   created(){
 
     this.$axios.get('/products').then((response) => {
-          //products list
          this.products = response.data.products;
-         if(this.products){
-            this.productIds = this.products.map(function(temp) {
-                return temp['id'];  });
-            this.productNames = this.products.map(function(temp) {
-                return temp['name'];  });
-         }
       });
      this.$axios.get('/shops').then((response) => {
-          //shops list
          this.shops = response.data.shops;
-         if(this.shops){
-            this.shopIds = this.shops.map(function(temp) {
-                return temp['id'];  });
-            this.shopNames = this.shops.map(function(temp) {
-                return temp['name'];  });
-         }
      });
   },
 }

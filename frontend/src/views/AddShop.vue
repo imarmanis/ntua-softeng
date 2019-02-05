@@ -3,21 +3,23 @@
           <form @submit.prevent="post">
               <h2>Προσθήκη Νέου Καταστήματος</h2>
               <label>Όνομα καταστήματος:</label>
-              <input name="s_name" type="text"
-                  v-validate="'required'"
-                  data-vv-as="*Το πεδίο"
-                  v-model="shop.name" />
-              <span
-                  v-show="errors.has('s_name')">
+              <label>
+                  <input name="s_name" type="text"
+                      v-validate="'required'"
+                      data-vv-as="*Το πεδίο"
+                      v-model="shop.name" />
+              </label>
+              <span>
                   {{ errors.first('s_name') }}
               </span>
               <label>Διεύθυνση:</label>
-              <input name="s_address" type="text"
-                  v-validate="'required'"
-                  data-vv-as="*Το πεδίο"
-                  v-model="shop.address" />
-              <span
-                  v-show="errors.has('s_address')">
+              <label>
+                  <input name="s_address" type="text"
+                      v-validate="'required'"
+                      data-vv-as="*Το πεδίο"
+                      v-model="shop.address" />
+              </label>
+              <span>
                   {{ errors.first('s_address') }}
               </span>
               <label>Ετικέτες:</label>
@@ -66,8 +68,7 @@ export default {
                         {
                             name: this.shop.name,
                             address: this.shop.address,
-                            tags: this.shop.tags.map(function(tag) {
-                                return tag['text'];  }),
+                            tags: this.shop.tags.map((tag) => tag['text']),
                             lat: this.shop.lat,
                             lng: this.shop.lng
                         },
@@ -90,7 +91,7 @@ export default {
       this.shop.tags = [];
     },
   },
-  updated(){
+  mounted() {
     bus.$on('coordChanged',(data) => {
       this.shop.lat = data[0];
       this.shop.lng = data[1];

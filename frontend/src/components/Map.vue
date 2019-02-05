@@ -33,7 +33,7 @@ export default {
   methods: {
     rightClick: function(event) {
       this.coordinates = event.latlng;
-      var temp = [];
+      const temp = [];
       temp[0] = event.latlng.lat;
       temp[1] = event.latlng.lng;
       bus.$emit('coordChanged',temp);
