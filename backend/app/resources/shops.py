@@ -4,11 +4,12 @@ from webargs import fields
 from webargs.flaskparser import use_args
 from marshmallow import validate
 from marshmallow.decorators import post_dump, pre_dump
-from app.models import Shop, ShopTag, db, ma
-from app.resources.auth import requires_auth
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import Point
 from sqlalchemy.exc import IntegrityError
+from app.models import Shop, ShopTag, db, ma
+from app.resources.auth import requires_auth
+from app.resources.utils import unique_stripped
 
 SORT_CHOICE = list(map('|'.join, itertools.product(['name', 'id'],
                                                    ['ASC', 'DESC'])))
@@ -50,7 +51,8 @@ class ShopsResource(Resource):
         'count': fields.Int(missing=20, location='query', validate=validate.Range(min=0)),
         'sort': fields.Str(missing='id|ASC', location='query',
                            many=True, validate=validate.OneOf(SORT_CHOICE)),
-        'status': fields.Str(missing='ACTIVE', location='query', validate=validate.OneOf(STATUS_CHOICE)),
+        'status': fields.Str(missing='ACTIVE', location='query',
+                             validate=validate.OneOf(STATUS_CHOICE)),
         'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))
     })
     def get(self, args):
@@ -88,17 +90,19 @@ class ShopsResource(Resource):
     })
     def post(self, args, **_kwargs):
         position = from_shape(Point(args['lng'], args['lat']), srid=4326)
-        new_shop = Shop(name=args['name'], address=args['address'], position=position, withdrawn=False)
-        new_shop.tags = [ShopTag(name=tag, shop=new_shop) for tag in args['tags'] if tag.strip()]
+        new_shop = Shop(name=args['name'], address=args['address'], position=position,
+                        withdrawn=False)
+        new_shop.tags = [ShopTag(name=tag, shop=new_shop) for tag in unique_stripped(args['tags'])]
         db.session.add(new_shop)
         try:
             db.session.commit()
         except IntegrityError as e:
             db.session.rollback()
             if "shop_pna_c" in e.orig:
-                return {'errors': {"Address/Position/Name": "Same address, position, name with existing shop"}}, 400
+                return {'errors': {"Address/Position/Name":
+                                   "Same address, position, name with existing shop"}}, 400
             else:
-                return {'errors': {"Tags": "Duplicate tags"}}, 400
+                return {'errors': {"Tags": "Duplicate tags"}}, 400  # we should never get here
         return shop_schema.dump(new_shop).data
 
 
@@ -109,7 +113,7 @@ class ShopResource(Resource):
     def get(self, _args, shop_id):
         shop = Shop.query.get_or_404(shop_id)
         return shop_schema.dump(shop).data
- 
+
     @requires_auth
     @use_args({
         'name': fields.Str(required=True, location='form'),
@@ -130,16 +134,17 @@ class ShopResource(Resource):
             db.session.flush()
         except IntegrityError:
             db.session.rollback()
-            return {'errors': {"Address/Position/Name": "Same address, position and name with existing shop"}}, 400
+            return {'errors': {"Address/Position/Name":
+                               "Same address, position and name with existing shop"}}, 400
         # flush delete's to db to ensure delete stmts precede insert stmt and avoid integrity error
-        shop.tags = [ShopTag(name=tag, shop=shop) for tag in args['tags'] if tag.strip()]
+        shop.tags = [ShopTag(name=tag, shop=shop) for tag in unique_stripped(args['tags'])]
         try:
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
-            return {'errors': {"Tags": "Duplicate tags"}}, 400
+            return {'errors': {"Tags": "Duplicate tags"}}, 400  # we should never get here
         return shop_schema.dump(shop).data
- 
+
     @requires_auth
     @use_args({
         'name': fields.Str(location='form'),
@@ -159,11 +164,10 @@ class ShopResource(Resource):
             for tag in shop.tags:
                 db.session.delete(tag)
             db.session.flush()
-            shop.tags = [ShopTag(name=tag, shop=shop) for tag in args['tags'] if tag.strip()]
+            shop.tags = [ShopTag(name=tag, shop=shop) for tag in unique_stripped(args['tags'])]
         elif changed == 'lat':
             old = to_shape(shop.position)
             shop.position = from_shape(Point(old.x, args['lat']), srid=4326)
-            pass
         elif changed == 'lng':
             old = to_shape(shop.position)
             shop.position = from_shape(Point(args['lng'], old.y), srid=4326)
@@ -175,12 +179,13 @@ class ShopResource(Resource):
         except IntegrityError:
             db.session.rollback()
             if changed == 'tags':
-                return {'errors': {"Tags": "Duplicate tags"}}, 400
+                return {'errors': {"Tags": "Duplicate tags"}}, 400  # we should never get here
             else:
-                return {'errors': {"Address/Position/Name": "Same address, position and name with existing shop"}}, 400
+                return {'errors': {"Address/Position/Name":
+                                   "Same address, position and name with existing shop"}}, 400
 
         return ShopSchema().dump(shop).data
- 
+
     @requires_auth
     @use_args({
         'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))
