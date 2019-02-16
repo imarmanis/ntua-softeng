@@ -33,7 +33,7 @@ class Product(db.Model):
     category = db.Column(db.String(128), nullable=False)
     withdrawn = db.Column(db.Boolean, nullable=False, default=False)
     tags = db.relationship('ProductTag', lazy='joined', backref='product',
-                           passive_deletes=True, cascade="all, delete-orphan")  # we don't allow a product with no tags. Should we?
+                           passive_deletes=True, cascade="all, delete-orphan")
     prices = db.relationship('Price', lazy='joined', backref='product',
                              passive_deletes=True, cascade="all, delete-orphan")
 
