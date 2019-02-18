@@ -12,16 +12,6 @@
               <span>
                   {{ errors.first('s_name') }}
               </span>
-              <label>Διεύθυνση:</label>
-              <label>
-                  <input name="s_address" type="text"
-                      v-validate="'required'"
-                      data-vv-as="*Το πεδίο"
-                      v-model="shop.address" />
-              </label>
-              <span>
-                  {{ errors.first('s_address') }}
-              </span>
               <label>Ετικέτες:</label>
               <vue-tags-input
               v-model="shop.tag"
@@ -29,9 +19,9 @@
               :tags="shop.tags"
               @tags-changed="newTags => shop.tags = newTags"
               />
-              <label>Επέλεξε το σημείο που βρίσκεται το κατάστημα με δεξί κλικ
-                 πάνω στον χάρτη:</label>
+              <label>Πληκτρολόγησε την διεύθυνση του καταστήματος και αν θες μετακίνησε τον δείκτη στον χάρτη για μεγαλύτερη ακρίβεια στην τοποθεσία:</label>
               <myMap></myMap>
+              <label v-if="validate_address">*Η διεύθυνση του καταστήματος δεν έχει συμπληρωθεί.</label>
               <p>
                 <input type="submit" value="Προσθήκη">
               </p>
@@ -49,6 +39,7 @@ export default {
   },
   data() {
     return {
+      validate_address: false,
       shop:{
         name: '',
         address: '',
@@ -62,6 +53,8 @@ export default {
   methods:{
     post: function(){
         this.$validator.validateAll().then(valid => {
+          if(this.shop.address){
+            this.validate_address = false;
             if (valid) {
                 this.$axios.post('/shops',
                     qs.stringify(
@@ -81,10 +74,15 @@ export default {
                     this.doReset();
                 });
             }
+          }
+          else{
+              this.validate_address = true;
+          }
         });
   },
     doReset: function(){
       this.$validator.reset();
+      this.validate_address = false;
       this.shop.name = '';
       this.shop.address = '';
       this.shop.tag = '';
@@ -92,9 +90,11 @@ export default {
     },
   },
   mounted() {
-    bus.$on('coordChanged',(data) => {
+    bus.$on('markerChanged',(data) => {
       this.shop.lat = data[0];
       this.shop.lng = data[1];
+      this.shop.address = data[2];
+      this.validate_address = false;
     });
   },
 }
