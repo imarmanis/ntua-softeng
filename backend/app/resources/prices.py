@@ -1,9 +1,8 @@
 import itertools
 from datetime import date, timedelta
 from flask_restful import Resource
-from webargs import fields
+from webargs import fields, validate
 from webargs.flaskparser import use_args
-from marshmallow import validate
 from marshmallow.decorators import post_dump, pre_dump
 from app.models import Product, Shop, Price, db, ma, ProductTag, ShopTag
 from sqlalchemy import asc, desc, func, or_

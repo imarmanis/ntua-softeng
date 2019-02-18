@@ -1,8 +1,8 @@
 from flask_restful import Resource
-from webargs import fields
+from webargs import fields, validate
 from webargs.flaskparser import use_args
 import marshmallow
-from marshmallow import validate, post_dump
+from marshmallow import post_dump
 from sqlalchemy.exc import IntegrityError
 from app.models import db, ma, Product, ProductTag
 from app.resources.auth import requires_auth

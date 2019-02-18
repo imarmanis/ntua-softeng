@@ -1,8 +1,7 @@
 import itertools
 from flask_restful import Resource
-from webargs import fields
+from webargs import fields, validate
 from webargs.flaskparser import use_args
-from marshmallow import validate
 from marshmallow.decorators import post_dump, pre_dump
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import Point
@@ -10,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from app.models import Shop, ShopTag, db, ma
 from app.resources.auth import requires_auth
 from app.resources.utils import unique_stripped
+
 
 SORT_CHOICE = list(map('|'.join, itertools.product(['name', 'id'],
                                                    ['ASC', 'DESC'])))

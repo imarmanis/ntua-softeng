@@ -1,11 +1,12 @@
 from functools import wraps
 from secrets import token_urlsafe
 from flask import request
-from marshmallow import fields, validate
+from webargs import fields, validate
 from webargs.flaskparser import use_args
 from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
 from app.models import User, db
+
 
 not_authorized = '', 403
 bad_request = '', 400
@@ -73,7 +74,7 @@ class LoginResource(Resource):
 class RegisterResource(Resource):
     @use_args({
         'username': fields.Str(required=True, location='form'),
-        'password': fields.Str(required=True, location='form'),
+        'password': fields.Str(required=True, location='form', validate=validate.Length(min=1)),
         'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))
     })
     def post(self, args):
@@ -85,3 +86,5 @@ class RegisterResource(Resource):
             # username is in use
             db.session.rollback()
             return bad_request
+
+        return {'message': 'OK'}
