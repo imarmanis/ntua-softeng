@@ -10,5 +10,5 @@ venv/
 *.out
 *.pdf
 *.synctex.gz
-#only pdfs in docs folder
-!docs/*.pdf
+#only pdfs in folders under docs/
+!docs/*/*.pdf
