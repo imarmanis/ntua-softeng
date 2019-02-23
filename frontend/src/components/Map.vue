@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { L, LMap, LTileLayer, LMarker, LPopup } from 'vue2-leaflet';
+import { L, LMap, LTileLayer} from 'vue2-leaflet';
 import { OpenStreetMapProvider } from 'leaflet-geosearch';
 import VGeosearch from 'vue2-leaflet-geosearch';
 import { bus } from '../main'
