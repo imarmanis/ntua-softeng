@@ -21,7 +21,6 @@ Vue.use(VueSidebarMenu);
 Vue.use(VueTagsInput);
 Validator.localize({ el: el });
 
-export const bus = new Vue();
 
 delete L.Icon.Default.prototype._getIconUrl;
 

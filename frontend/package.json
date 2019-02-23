@@ -12,6 +12,7 @@
     "@fortawesome/fontawesome-free": "^5.7.1",
     "@johmun/vue-tags-input": "^2.0.0",
     "leaflet-geosearch": "^2.7.0",
+    "leaflet.locatecontrol": "^0.66.1",
     "qs": "^6.6.0",
     "vee-validate": "^2.1.7",
     "vue": "^2.5.21",

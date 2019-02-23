@@ -113,10 +113,10 @@
                 {
                     title: "Search", 
                     child:
-                           [{
-                               title: 'Αναζήτηση καταστήματος',
-                               disabled: true
-                           },
+                          [{
+                             href: '/searchPrice',
+                             title: 'Αναζήτηση καταστήματος'
+                          },
                            {
                                title: 'Αναζήτηση προϊόντος',
                                disabled: true
