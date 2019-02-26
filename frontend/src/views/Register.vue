@@ -1,33 +1,49 @@
 <template>
-    <div id="add-product">
-          <form @submit.prevent="post">
-              <h2>Εγγραφή νέου χρήστη</h2>
-              <label>Όνομα</label>
-              <label>
-                  <input name="u_name" type="text"
-                      v-validate="'required'"
-                      data-vv-as="*Το πεδίο"
-                      v-model="user.name" />
-              </label>
-              <span
-                  style="color:red">
-                  {{ errors.first('u_name') }}
-              </span>
-              <label>Κωδικός</label>
-              <label>
-                  <input name="u_password" type="text"
-                      v-validate="'required'"
-                      data-vv-as="*Το πεδίο"
-                      v-model="user.password" />
-              </label>
-              <span
-                  style="color:red">
-                  {{ errors.first('u_password') }}
-              </span>
-              <p>
-                <input type="submit" value="Εγγραφή">
-              </p>
-          </form>
+    <div id="register">
+       <b-jumbotron lead="Εγγραφή νέου χρήστη">
+          <b-form @submit.prevent="post" >
+            <b-form-group
+              :invalid-feedback="errors.first('u_name')"
+              id="u_namegroup" label="Όνομα" label-for="u_name" >
+              <b-form-input
+                id="u_name"
+                data-vv-as="*Το πεδίο"
+                v-model="user.name"
+                name="u_name"
+                type="text"
+                v-validate="'required'"
+                :state="errors.has('u_name') ? false :null"
+                placeholder="Όνομα"
+              /> 
+           </b-form-group>               
+          <b-form-group
+              :invalid-feedback="errors.first('u_pass_conf')"
+              id="u_passgroup" label="Κωδικός" label-for="u_pass" >
+              <b-form-input
+                id="u_pass"
+                ref="u_pass"
+                data-vv-as="την επιβεβαίωση"
+                v-model="user.password"
+                name="u_pass"
+                type="password"
+                v-validate="'required'"
+                :state="errors.has('u_pass') ? false :null"
+                placeholder="Κωδικός"
+              />
+              <b-form-input
+                id="u_pass_conf"
+                data-vv-as="*Το πεδίο"
+                
+                name="u_pass_conf"
+                type="password"
+                v-validate="'required|confirmed:u_pass'"
+                :state="errors.has('u_pass_conf') ? false :null"
+                placeholder="Επιβεβαιώστε τον κωδικό"
+              /> 
+           </b-form-group> 
+           <b-button type="submit" variant="primary">Εγγραφή</b-button>
+          </b-form>
+        </b-jumbotron>
     </div>
 </template>
 
@@ -71,10 +87,10 @@ export default {
 </script>
 
 <style scoped>
-#add-product *{
+#register *{
     box-sizing: border-box;
 }
-#add-product{
+#register{
     margin: 20px auto;
     max-width: 500px;
 }

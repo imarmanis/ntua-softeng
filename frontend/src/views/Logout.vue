@@ -18,7 +18,6 @@ export default {
   methods:{
     logout: function(){
          this.$store.dispatch('logout').then(()=>{
-                       alert("Κάνατε logout επιτυχώς!");
                        this.$router.push('/')
                     });
                 }

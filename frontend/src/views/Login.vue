@@ -1,33 +1,38 @@
 <template>
     <div id="login">
-          <form @submit.prevent="login" >
-              <h2>Login χρήστη</h2>
-              <label>Όνομα</label>
-              <label>
-                  <input name="u_name" type="text"
-                      v-validate="'required'"
-                      data-vv-as="*Το πεδίο"
-                      v-model="user.name" />
-              </label>
-              <span
-                  style="color:red">
-                  {{ errors.first('u_name') }}
-              </span>
-              <label>Κωδικός</label>
-              <label>
-                  <input name="u_password" type="text"
-                      v-validate="'required'"
-                      data-vv-as="*Το πεδίο"
-                      v-model="user.password" />
-              </label>
-              <span
-                  style="color:red">
-                  {{ errors.first('u_password') }}
-              </span>
-              <p>
-                <input type="submit" value="Login">
-              </p>
-          </form>
+       <b-jumbotron lead="Login χρήστη">
+          <b-form @submit.prevent="login" >
+            <b-form-group
+              :invalid-feedback="errors.first('u_name')"
+              id="u_namegroup" label="Όνομα" label-for="u_name" >
+              <b-form-input
+                id="u_name"
+                data-vv-as="*Το πεδίο"
+                v-model="user.name"
+                name="u_name"
+                type="text"
+                v-validate="'required'"
+                :state="errors.has('u_name') ? false :null"
+                placeholder="Όνομα"
+              /> 
+           </b-form-group>               
+          <b-form-group
+              :invalid-feedback="errors.first('u_pass')"
+              id="u_passgroup" label="Κωδικός" label-for="u_pass" >
+              <b-form-input
+                id="u_pass"
+                data-vv-as="*Το πεδίο"
+                v-model="user.password"
+                name="u_pass"
+                type="password"
+                v-validate="'required'"
+                :state="errors.has('u_pass') ? false :null"
+                placeholder="Κωδικός"
+              /> 
+           </b-form-group> 
+           <b-button type="submit" variant="primary">Login</b-button>
+          </b-form>
+        </b-jumbotron>
     </div>
 </template>
 
