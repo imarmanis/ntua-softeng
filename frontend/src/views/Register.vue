@@ -17,8 +17,8 @@
               /> 
            </b-form-group>               
           <b-form-group
-              :invalid-feedback="errors.first('u_pass_conf')"
-              id="u_passgroup" label="Κωδικός" label-for="u_pass" >
+                :invalid-feedback="errors.first('u_pass_conf')"
+                id="u_passgroup" label="Κωδικός" label-for="u_pass" >
               <b-form-input
                 id="u_pass"
                 ref="u_pass"
@@ -36,6 +36,7 @@
                 
                 name="u_pass_conf"
                 type="password"
+                class="form-control"
                 v-validate="'required|confirmed:u_pass'"
                 :state="errors.has('u_pass_conf') ? false :null"
                 placeholder="Επιβεβαιώστε τον κωδικό"
