@@ -20,7 +20,7 @@
               @tags-changed="newTags => shop.tags = newTags"
               />
               <label>Πληκτρολόγησε την διεύθυνση του καταστήματος και αν θες μετακίνησε τον δείκτη στον χάρτη για μεγαλύτερη ακρίβεια στην τοποθεσία:</label>
-              <myMap></myMap>
+              <myMap @markerChanged="markerChanged" :with-geocoding="true" :with-location="true"></myMap>
               <label v-if="validate_address">*Η διεύθυνση του καταστήματος δεν έχει συμπληρωθεί.</label>
               <p>
                 <input type="submit" value="Προσθήκη">
@@ -32,7 +32,6 @@
 <script>
 import qs from 'qs';
 import myMap from '../components/Map.vue'
-import { bus } from '../main'
 export default {
   components:{
     'myMap': myMap
@@ -80,6 +79,12 @@ export default {
           }
         });
   },
+      markerChanged : function (data) {
+          this.shop.lat = data[0];
+          this.shop.lng = data[1];
+          this.shop.address = data[2];
+          this.validate_address = false;
+      },
     doReset: function(){
       this.$validator.reset();
       this.validate_address = false;
@@ -88,14 +93,6 @@ export default {
       this.shop.tag = '';
       this.shop.tags = [];
     },
-  },
-  mounted() {
-    bus.$on('markerChanged',(data) => {
-      this.shop.lat = data[0];
-      this.shop.lng = data[1];
-      this.shop.address = data[2];
-      this.validate_address = false;
-    });
   },
 }
 </script>

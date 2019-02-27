@@ -50,6 +50,7 @@
                    <b-form-select v-model="price.productId"
                       v-validate="'required'"
                       name="product_name"
+<<<<<<< HEAD
                       data-vv-as="*Το πεδίο"
                       v-for="product in products"
                       :value="product.id"
@@ -62,27 +63,33 @@
               :invalid-feedback="errors.first('shop_name')"   
               label="Επίλεξε κατάστημα"
               label-cols =5   >
-                   <b-form-select v-model="price.shopId"
+                  <myMap :with-location="true" :data="shops" @markerSelected="shopSelected"></myMap>
+                  <b-form-select v-model="price.shopId"
                       v-validate="'required'"
                       name="shop__name"
-                      data-vv-as="*Το πεδίο"
+                      data-vv-as="*Το κατάστημα"
                       v-for="shop in shops"
                       :value="shop.id"
                       :key="shop.id"
                       {{ shop.name }}
                   />
             </b-form-group>
+            {{ shopData }}
             <b-button type="submit" variante="primary">Προσθήκη</b-button>
           </b-form>
        </b-jumbotron>
+=======
+>>>>>>> master
     </div>
 </template>
 
 <script>
 import qs from 'qs';
+import myMap from '../components/Map.vue'
+import { L } from 'vue2-leaflet'
 export default {
   components:{
-
+    myMap
   },
   data() {
     return {
@@ -95,9 +102,14 @@ export default {
       },
       shops: [],
       products: [],
+      shopData: null
     }
   },
   methods:{
+      shopSelected: function (shop) {
+          this.price.shopId = shop.id;
+          this.shopData = shop;
+      },
       post: function(){
           this.$validator.validateAll().then(valid => {
               if (valid) {
@@ -125,13 +137,14 @@ export default {
       this.price.shopId = null;
     }
   },
-  created(){
-
+  mounted(){
     this.$axios.get('/products').then((response) => {
          this.products = response.data.products;
       });
      this.$axios.get('/shops').then((response) => {
-         this.shops = response.data.shops;
+         const shops = response.data.shops;
+         shops.forEach((x) => x['latlng'] = new L.latLng(x.lat, x.lng));
+         this.shops = shops;
      });
   },
 }
