@@ -30,7 +30,7 @@
                 placeholder="Κωδικός"
               /> 
            </b-form-group>
-           <b-alert variant="danger" v-model="err.error" >INCORRECT</b-alert> 
+           <b-alert variant="danger" v-model="err.error" >ΑΠΟΤΥΧΙΑ (ελέγξε τον κωδικό)</b-alert> 
            <b-button type="submit" variant="primary">Login</b-button>
           </b-form>
         </b-jumbotron>

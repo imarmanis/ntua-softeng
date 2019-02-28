@@ -43,7 +43,7 @@
               /> 
            </b-form-group> 
            <b-alert variant="success" v-model="err.suc" >ΕΠΙΤΥΧΙΑ</b-alert>
-           <b-alert variant="danger" v-model="err.error">ΑΠΟΤΥΧΙΑ</b-alert>
+           <b-alert variant="danger" v-model="err.error">ΑΠΟΤΥΧΙΑ (όνομα υπό χρηση) </b-alert>
            <b-button type="submit" variant="primary">Εγγραφή</b-button>
           </b-form>
         </b-jumbotron>
