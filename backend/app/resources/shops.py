@@ -28,8 +28,8 @@ class ShopTagSchema(ma.ModelSchema):
 
 class ShopSchema(ma.ModelSchema):
     tags = fields.Nested(ShopTagSchema, many=True)
-    lng = fields.Int()
-    lat = fields.Int()
+    lng = fields.Float()
+    lat = fields.Float()
 
     class Meta:
         model = Shop
