@@ -155,7 +155,7 @@ class PricesResource(Resource):
         prices = PricesResource.PriceSchema(many=True).dump(prices_page).data
         return {
             'start': min(start, total),  # rows skipped due to offset
-            'count': len(prices_page),
+            'count': count,
             'total': total,
             'prices': prices
         }
@@ -197,4 +197,10 @@ class PricesResource(Resource):
             Price.shop_id == args['shop_id'],
             Price.date.between(date1, date2)
         ).all()
-        return PricesResource.PriceSchema(many=True).dump(new_prices).data
+        return {
+            'start': 0,
+            'total': (date2-date1).days + 1,
+            'count': (date2-date1).days + 1,
+            # why you ask ? no idea, field must be present, can't find any sensible value
+            'prices': PricesResource.PriceSchema(many=True).dump(new_prices).data
+        }
