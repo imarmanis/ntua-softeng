@@ -29,7 +29,8 @@
                 :state="errors.has('u_pass') ? false :null"
                 placeholder="Κωδικός"
               /> 
-           </b-form-group> 
+           </b-form-group>
+           <b-alert variant="danger" v-model="err.error" >INCORRECT</b-alert> 
            <b-button type="submit" variant="primary">Login</b-button>
           </b-form>
         </b-jumbotron>
@@ -47,6 +48,9 @@ export default {
         name: null,
         password: null
       },
+      err :{
+        error: null
+      }
     }
   },
   methods:{
@@ -60,7 +64,7 @@ export default {
                        alert("Κάνατε login επιτυχώς!"+this.$store.getters.token);
                        this.doReset();
                        this.$router.push('/')
-                    }).catch(err=>{alert(err)}) ;
+                    }).catch(err=>{alert(err); this.err.error=true}) ;
                 }
             });
     },
