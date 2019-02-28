@@ -36,6 +36,8 @@
               <label v-if="validate_address">*Η διεύθυνση του καταστήματος δεν έχει συμπληρωθεί.</label>
               </b-form-group>
              <div class="spacer">
+             <b-alert variant="success" v-model="err.suc" >ΕΠΙΤΥΧΙΑ</b-alert>
+             <b-alert variant="danger" v-model="err.error">ΑΠΟΤΥΧΙΑ</b-alert>
              <b-button label-cols=1 type="submit" variant="primary">Προσθήκη</b-button>
              </div>
            </b-form>
@@ -61,6 +63,10 @@ export default {
         lat: null,
         lng: null,
       },
+      err:{
+        error: null,
+        suc: null
+      }
     }
   },
   methods:{
@@ -84,8 +90,12 @@ export default {
                     )
                 ).then(() => {
                     alert("Ευχαριστούμε για την προσθήκη ενός νέου καταστήματος!");
+                    this.err.suc=true;
+                    this.err.error=false;
                     this.doReset();
-                });
+                }).catch(err=>{alert(err);
+                         this.err.error=true;
+                         this.err.suc=false;})
             }
           }
           else{

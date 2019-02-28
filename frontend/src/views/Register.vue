@@ -42,6 +42,8 @@
                 placeholder="Επιβεβαιώστε τον κωδικό"
               /> 
            </b-form-group> 
+           <b-alert variant="success" v-model="err.suc" >ΕΠΙΤΥΧΙΑ</b-alert>
+           <b-alert variant="danger" v-model="err.error">ΑΠΟΤΥΧΙΑ</b-alert>
            <b-button type="submit" variant="primary">Εγγραφή</b-button>
           </b-form>
         </b-jumbotron>
@@ -60,6 +62,10 @@ export default {
         name: null,
         password: null
       },
+      err:{
+        error: null,
+        suc: null
+      }
     }
   },
   methods:{
@@ -74,7 +80,11 @@ export default {
                   ).then(() => {
                       alert("Ευχαριστούμε για την προσθήκη ενός νέου χρήστη!");
                       this.doReset();
-                  });
+                      this.err.suc=true;
+                      this.err.error=false;
+                  }).catch(err=>{alert(err);
+                                 this.err.error=true;
+                                 this.err.suc=false});
               }
           });
       },

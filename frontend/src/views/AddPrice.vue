@@ -73,6 +73,8 @@
                       :state="errors.has('shop_name')" >
                    </b-form-select>
             </b-form-group>
+            <b-alert variant="success" v-model="err.suc">ΕΠΙΤΥΧΙΑ</b-alert>
+            <b-alert variant="danger" v-model="err.error">ΑΠΟΤΥΧΙΑ</b-alert>
             <b-button type="submit" variant="primary">Προσθήκη</b-button>
           </b-form>
        </b-jumbotron>
@@ -98,7 +100,11 @@ export default {
       },
       shops: [],
       products: [],
-      shopData: null
+      shopData: null,
+      err:{
+        error: null,
+        suc: null
+      }
     }
   },
   methods:{
@@ -119,8 +125,9 @@ export default {
                       })
                   ).then(() => {
                       alert("Ευχαριστούμε για την προσθήκη μιας νέας τιμής!");
+                      this.err.error=false;this.err.suc=true;  
                       this.doReset();
-                  });
+                  }).catch(err=>{this.err.error=true;this.err.suc=false;alert(err)});
               }
           });
       },
