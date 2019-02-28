@@ -45,8 +45,8 @@
                                disabled: true
                            },
                            {
-                               title: 'Αναζήτηση τιμής',
-                               disabled: true
+                               href: '/searchPrice',
+                               title: 'Αναζήτηση τιμής'
                            }]
                 }]}
                 else {return [
@@ -84,16 +84,16 @@
                     title: "Search", 
                     child:
                           [{
-                             href: '/searchPrice',
-                             title: 'Αναζήτηση καταστήματος'
-                          },
+                             title: 'Αναζήτηση καταστήματος',
+                             disabled :true
+                           },
                            {
                                title: 'Αναζήτηση προϊόντος',
                                disabled: true
                            },
                            {
-                               title: 'Αναζήτηση τιμής',
-                               disabled: true
+                               href: '/searchPrice',
+                               title: 'Αναζήτηση τιμής'
                            }]
                 }]}}
             
