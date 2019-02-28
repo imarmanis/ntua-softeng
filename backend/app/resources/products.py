@@ -6,7 +6,7 @@ from marshmallow import post_dump
 from sqlalchemy.exc import IntegrityError
 from app.models import db, ma, Product, ProductTag
 from app.resources.auth import requires_auth
-from app.resources.utils import unique_stripped
+from app.resources.utils import unique_stripped, custom_error, ErrorCode
 
 
 class ProductTagSchema(ma.ModelSchema):
@@ -89,7 +89,7 @@ class ProductsResource(Resource):
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
-            return {'errors': {"Tags": "Duplicate tags"}}, 400  # we should never get here
+            return custom_error('tags', ['Duplicate tags']), ErrorCode.BAD_REQUEST  # we should never get here
 
         return prod_schema.dump(product).data
 
@@ -127,7 +127,7 @@ class ProductResource(Resource):
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
-            return {'errors': {"Tags": "Duplicate tags"}}, 400  # we should never get here
+            return custom_error('tags', ['Duplicate tags']), ErrorCode.BAD_REQUEST  # we should never get here
 
         return prod_schema.dump(product).data
 
@@ -142,7 +142,9 @@ class ProductResource(Resource):
     def patch(self, args, prod_id, **_kwargs):
         del args['format']
         if len(args) != 1:
-            return 'Specify exactly one of: name, description, category or tags', 400
+            return custom_error('patch', ['Specify exactly one of: name, description, category or tags']),\
+                   ErrorCode.BAD_REQUEST
+
         product = Product.query.get_or_404(prod_id)
         changed = next(iter(args.keys()))
         if changed == 'tags':
@@ -158,7 +160,7 @@ class ProductResource(Resource):
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
-            return {'errors': {"Tags": "Duplicate tags"}}, 400  # we should never get here
+            custom_error('tags', ['Duplicate tags']), ErrorCode.BAD_REQUEST  # we should never get here
 
         return prod_schema.dump(product).data
 
