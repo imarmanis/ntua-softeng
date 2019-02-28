@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { L, LMap, LTileLayer, LMarker, LPopup } from 'vue2-leaflet';
+import { L, LMap, LTileLayer, LMarker, LPopup} from 'vue2-leaflet';
 import { OpenStreetMapProvider } from 'leaflet-geosearch';
 import VGeosearch from 'vue2-leaflet-geosearch';
 import 'leaflet.locatecontrol';
@@ -129,8 +129,11 @@ export default {
 
 <style scoped>
 #map {
-  height: 380px;
-  width: 600px;
-  margin: 0;
+  height: 300px;
+  width: 150px;
+  min-height: 100%; 
+  min-width: 100%;
+  display: block;
 }
+
 </style>

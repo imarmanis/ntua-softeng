@@ -1,65 +1,81 @@
 <template>
     <div id="add-price">
-          <form @submit.prevent="post">
-              <h2>Προσθήκη τιμής</h2>
-              <label>Τιμή(€):</label>
-              <label>
-                  <input name="price" type="text"
-                      v-validate="'required|decimal:2|min_value:0.01'"
-                      data-vv-as="*Το πεδίο"
-                      v-model="price.cost" />
-              </label>
-              <span>{{ errors.first('price') }}</span>
-              <h4>Χρονικό διάστημα που το προϊόν έχει την παραπάνω τιμή:</h4>
-              <label>Ημερομηνία  από:</label>
-              <label>
-                  <input name="date_from" type="text"
-                      v-validate="'required|date_format:YYYY/MM/DD'"
-                      ref="fromDate"
+        <b-jumbotron lead="Προσθήκη τιμής">  
+        <b-form @submit.prevent="post">
+          <b-form-group 
+             :invalid-feedback="errors.first('price')"
+             id="pricegroup" label="Τιμή(€):" label-for="price" 
+             label-cols = 3 >
+            <b-form-input
+                name="price"
+                id="price" 
+                type="text"
+                v-validate="'required|decimal:2|min_value:0.01'"
+                data-vv-as="*Η τιμή"
+                v-model="price.cost"
+                :state="errors.has('price') ? false :null" 
+             />
+          </b-form-group>
+          <b-form-group
+              id="dategroupfrom"
+              :invalid-feedback="errors.first('date_from')"
+              label="Ημερομηνία  από:"
+              label-cols = 3 >
+                  <b-form-input name="date_from" type="date"
+                      v-validate="'required|date_format:YYYY-MM-DD'"
+                      ref="_fromDate"
                       data-vv-as="*Η ημερομηνία"
-                      v-model="price.dateFrom" />
-              </label>
-              <span>{{ errors.first('date_from') }}</span>
-              <label>Ημερομηνία εώς:</label>
-              <label>
-                  <input name="date_to" type="text"
-                      v-validate="'required|date_format:YYYY/MM/DD|after:fromDate,true'"
+                      v-model="price.dateFrom" 
+                      :state="errors.has('date_from') ? false :null" 
+                  />
+           </b-form-group>
+           <b-form-group
+              id="dategroupto"
+              :invalid-feedback="errors.first('date_to')"   
+              label="Ημερομηνία εώς:"
+              label-for="date-to"  
+              label-cols= 3 
+              description="Hint: Πιέστε το βελάκι για ημερολόγιο" > 
+                  <b-form-input id="date_to" name="date_to" type="date"
+                      v-validate="'required|date_format:YYYY-MM-DD|after:_fromDate,true'"
                       data-vv-as="*Η ημερομηνία"
-                      v-model="price.dateTo" />
-              </label>
-              <span>{{ errors.first('date_to') }}</span>
-              <label>Επέλεξε το προϊόν:</label>
-              <label>
-                  <select v-model="price.productId"
+                      v-model="price.dateTo"
+                      :state="errors.has('date_to') ? false :null" 
+                   />
+            </b-form-group>
+            <b-form-group
+              id="productgroup"
+              :invalid-feedback="errors.first('product_name')"   
+              label="Επίλεξε προιόν"
+              label-cols=3   >
+                   <b-form-select v-model="price.productId"
                       v-validate="'required'"
                       name="product_name"
-                      data-vv-as="*Το πεδίο">
-                    <option v-for="product in products"
-                            v-bind:value="product.id"
-                            v-bind:key="product.id">
-                        {{ product.name }}
+                      data-vv-as="*Το πεδίο"
+                      :state = "errors.has('product_name') ? false :null" >
+                   <option   v-for="product in products"
+                      v-bind:value="product.id"
+                      v-bind:key="product.id" >
+                      {{ product.name }}
                     </option>
-                  </select>
-              </label>
-              <span>{{ errors.first('product_name') }}</span>
-              <label>Επέλεξε το κατάστημα:</label>
-              <label>
-                  <myMap :with-location="true" :data="shops" @markerSelected="shopSelected"></myMap>
-                  <select hidden v-model="price.shopId"
+                  </b-form-select>
+            </b-form-group>
+            <b-form-group
+              id="shopgroup"
+              :invalid-feedback="errors.first('shop_name')"
+              label="Επίλεξε κατάστημα"
+              label-cols =3   >
+                 <myMap :with-location="true" :data="shops" @markerSelected="shopSelected"></myMap>
+                  <b-form-select hidden v-model="price.shopId"
                       v-validate="'required'"
                       name="shop_name"
-                      data-vv-as="*Το κατάστημα">
-                      <!-- Hack-ish, how to add v-validate without html ? -->
-                  </select>
-              </label>
-              <span>{{ errors.first('shop_name') }}</span>
-              <div v-if="true">
-                  {{ shopData }}
-              </div>
-              <p>
-                <input type="submit" value="Προσθήκη">
-              </p>
-          </form>
+                      data-vv-as="*Το κατάστημα"
+                      :state="errors.has('shop_name')" >
+                   </b-form-select>
+            </b-form-group>
+            <b-button type="submit" variant="primary">Προσθήκη</b-button>
+          </b-form>
+       </b-jumbotron>
     </div>
 </template>
 
@@ -136,7 +152,7 @@ export default {
 }
 #add-price{
     margin: 20px auto;
-    max-width: 500px;
+    max-width: 750px;
 }
 label{
     display: block;

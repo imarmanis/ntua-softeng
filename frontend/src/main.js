@@ -1,7 +1,10 @@
 import Vue from 'vue'
+import BootstrapVue from 'bootstrap-vue'
 import VueSidebarMenu from 'vue-sidebar-menu'
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
 import '@fortawesome/fontawesome-free/css/all.css'
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -15,9 +18,10 @@ import './plugins/axios'
 Vue.config.productionTip = false;
 
 
-Vue.use(VeeValidate, {locale: 'el'});
+Vue.use(VeeValidate, {inject: true, fieldsBagName: 'veeFields', locale: 'el'});
 // Use packages
 Vue.use(VueSidebarMenu);
+Vue.use(BootstrapVue);
 Vue.use(VueTagsInput);
 Validator.localize({ el: el });
 

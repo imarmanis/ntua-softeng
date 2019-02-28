@@ -1,5 +1,5 @@
 <template>
-   <sidebar-menu :menu="menu" :collapsed="collapsed" :width="width" />
+   <sidebar-menu :menu="menu" :collapsed="collapsed" :width="width"/>
 </template>
 
 <script>
@@ -34,22 +34,6 @@
                            }]
                 },
                 {
-                    title: "Delete", 
-                    child:
-                           [{
-                               title: 'Διαγραφή καταστήματος',
-                               disabled: true
-                           },
-                           {
-                               title: 'Διαγραφή προϊόντος',
-                               disabled: true
-                           },
-                           {
-                               title: 'Διαγραφή τιμής',
-                               disabled: true
-                           }]
-                },
-                {
                     title: "Search", 
                     child:
                            [{
@@ -61,8 +45,8 @@
                                disabled: true
                            },
                            {
-                               title: 'Αναζήτηση τιμής',
-                               disabled: true
+                               href: '/searchPrice',
+                               title: 'Αναζήτηση τιμής'
                            }]
                 }]}
                 else {return [
@@ -83,11 +67,13 @@
                     child:
                            [{
                                href: '/addshop',
-                               title: 'Νέο κατάστημα'
+                               title: 'Νέο κατάστημα',
+                               disabled: true
                            },
                            {
                                href: '/addproduct',
-                               title: 'Νέο προϊόν'
+                               title: 'Νέο προϊόν',
+                               disabled: true
                            },
                            {
                                href: '/addprice',
@@ -95,35 +81,19 @@
                            }]
                 },
                 {
-                    title: "Delete", 
-                    child:
-                           [{
-                               title: 'Διαγραφή καταστήματος',
-                               disabled: true
-                           },
-                           {
-                               title: 'Διαγραφή προϊόντος',
-                               disabled: true
-                           },
-                           {
-                               title: 'Διαγραφή τιμής',
-                               disabled: true
-                           }]
-                },
-                {
                     title: "Search", 
                     child:
                           [{
-                             href: '/searchPrice',
-                             title: 'Αναζήτηση καταστήματος'
-                          },
+                             title: 'Αναζήτηση καταστήματος',
+                             disabled :true
+                           },
                            {
                                title: 'Αναζήτηση προϊόντος',
                                disabled: true
                            },
                            {
-                               title: 'Αναζήτηση τιμής',
-                               disabled: true
+                               href: '/searchPrice',
+                               title: 'Αναζήτηση τιμής'
                            }]
                 }]}}
             

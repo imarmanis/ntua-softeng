@@ -18,7 +18,6 @@ export default {
   methods:{
     logout: function(){
          this.$store.dispatch('logout').then(()=>{
-                       alert("Κάνατε logout επιτυχώς!");
                        this.$router.push('/')
                     });
                 }
@@ -33,7 +32,7 @@ export default {
 }
 #login{
     margin: 20px auto;
-    max-width: 500px;
+    max-width: 750px;
 }
 label{
     display: block;

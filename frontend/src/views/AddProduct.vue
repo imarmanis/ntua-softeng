@@ -1,43 +1,62 @@
 <template>
-    <div id="add-product">
-          <form @submit.prevent="post">
-              <h2>Προσθήκη Νέου Προϊόντος</h2>
-              <label>Όνομα καυσίμου:</label>
-              <label>
-                  <input name="p_name" type="text"
-                      v-validate="'required'"
-                      data-vv-as="*Το πεδίο"
-                      v-model="product.name" />
-              </label>
-              <span>
-                  {{ errors.first('p_name') }}
-              </span>
-              <label>Περιγραφή:</label>
-              <label>
-                  <textarea v-model.lazy="product.description"></textarea>
-              </label>
-              <label>Κατηγορία:</label>
-              <label>
-                  <input name="p_category" type="text"
-                      v-validate="'required'"
-                      data-vv-as="*Το πεδίο"
-                      v-model="product.category" />
-              </label>
-              <span>
-                  {{ errors.first('p_category') }}
-              </span>
-              <label>Ετικέτες:</label>
-              <vue-tags-input
+  <div  id="add-product" >
+    <b-jumbotron lead="Προσθήκη προιόντος" >
+    <b-form @submit.prevent="post" @reset="doReset" >
+      <b-form-group 
+        :invalid-feedback="errors.first('p_name')"
+        id="p_namegroup" label="Όνομα καυσίμου:" label-for="p_name" 
+        label-cols=3>
+        <b-form-input 
+          id="p_name" 
+          data-vv-as="*Το πεδίο"
+          v-model="product.name"
+          name="p_name" 
+          type="text"
+          v-validate="'required'"
+          :state="errors.has('p_name') ? false : null"
+          placeholder="πχ Αμόλυβδη"
+        />
+      </b-form-group>
+
+      <b-form-group id="desc" label="Περιγραφή:" label-for="desc"
+        label-cols=3>
+        <b-form-textarea
+          id="desc"
+          type="text"
+          v-model.lazy="product.description"
+          placeholder="Πείτε μας κάτι για το προιόν" />
+      </b-form-group>
+      
+      <b-form-group 
+        :invalid-feedback="errors.first('p_category')"
+        id="p_categroup" label="Κατηγορία:" label-for="p_category" label-cols=3 >
+        <b-form-input 
+          id="p_category" 
+          data-vv-as="*Το πεδίο"
+          v-model="product.category"
+          name="p_category" 
+          type="text"
+          v-validate="'required'"
+          :state="errors.has('p_category') ? false : null"
+          placeholder="πχ Αμόλυβδη"
+        />
+      </b-form-group>
+
+      <b-form-group id="tags" label="Ετικέτες:" label-for="p_tags" label-cols=3>
+         <vue-tags-input
+              id="p_tags"
               v-model="product.tag"
               placeholder = ""
               :tags="product.tags"
               @tags-changed="newTags => product.tags = newTags"
               />
-              <p>
-                <input type="submit" value="Προσθήκη">
-              </p>
-          </form>
-    </div>
+      </b-form-group>
+
+      <b-button type="submit" variant="primary">Προσθήκη</b-button>
+      <b-button type="reset" variant="danger">Καθαρισμός</b-button>
+    </b-form>
+   </b-jumbotron>
+  </div>
 </template>
 
 <script>
@@ -99,20 +118,6 @@ export default {
 }
 #add-product{
     margin: 20px auto;
-    max-width: 500px;
+    max-width: 750px;
 }
-label{
-    display: block;
-    margin: 20px 0 10px;
-}
-input[type="text"], textarea{
-    display: block;
-    width: 100%;
-    padding: 8px;
-}
-
-h3{
-    margin-top: 10px;
-}
-
 </style>
