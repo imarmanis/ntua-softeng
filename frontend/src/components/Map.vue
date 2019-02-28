@@ -129,8 +129,8 @@ export default {
 
 <style scoped>
 #map {
-  height: 200px;
-  width: 100px;
+  height: 300px;
+  width: 150px;
   min-height: 100%; 
   min-width: 100%;
   display: block;
