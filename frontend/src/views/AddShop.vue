@@ -9,30 +9,38 @@
                :invalid-feedback="errors.first('s_name')" >
               <b-form-input name="s_name" id="s_name" type="text"
                       v-validate="'required'"
-                      data-vv-as="*Το πεδίο"
+                      data-vv-as="*Το όνομα"
                       v-model="shop.name" 
                       :state="errors.has('s_name') ? false :null" 
                />
             </b-form-group>  
              <b-form-group 
-               :invalid-feedback="errors.first('tag_name')"
-               id="taggroup" label="Ετικέτες:" 
+               id="tags" label="Ετικέτες:"
+               label-for="s_tags" 
                label-cols =3 >
-              <vue-tags-input name="tag_name" type="text"
-                      v-validate="'required'"
-                      data-vv-as="*Το πεδίο"
-                      v-model="shop.tag"
+              <vue-tags-input 
+                      name="s_tags" 
+                      id="s_tags"
+                      v-model= "shop.tag"     
                       placeholder= ""
                       :tags="shop.tags" 
-                       @tags-changed="newTags => shop.tags = newTags"
+                      @tags-changed="newTags => shop.tags = newTags"
               />
             </b-form-group>
-              <b-form-group 
+            <b-form-group
+            :invalid-feedback="errors.first('shop_loc')" 
             id="mapgroup"
                label="Τοποθεσία"
                 label-cols=3
               description="Hint: Πληκτρολόγησε την διεύθυνση του καταστήματος και αν θες μετακίνησε τον δείκτη στον χάρτη για μεγαλύτερη ακρίβεια στην τοποθεσία:">
-              <myMap @markerChanged="markerChanged" :with-geocoding="true" :with-location="true"></myMap>
+             <myMap @markerChanged="markerChanged" :with-geocoding="true" :with-location="true"></myMap>
+             <b-form-select hidden v-model="markerChanged"
+
+              v-validate="'required'"
+              name="shop_loc"
+              data-vv-as="*Η τοποθεσία"
+              :state="errors.has('shop_loc')" >
+              </b-form-select>
               <label v-if="validate_address">*Η διεύθυνση του καταστήματος δεν έχει συμπληρωθεί.</label>
               </b-form-group>
              <div class="spacer">
