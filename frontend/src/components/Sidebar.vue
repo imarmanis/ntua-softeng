@@ -34,22 +34,6 @@
                            }]
                 },
                 {
-                    title: "Delete", 
-                    child:
-                           [{
-                               title: 'Διαγραφή καταστήματος',
-                               disabled: true
-                           },
-                           {
-                               title: 'Διαγραφή προϊόντος',
-                               disabled: true
-                           },
-                           {
-                               title: 'Διαγραφή τιμής',
-                               disabled: true
-                           }]
-                },
-                {
                     title: "Search", 
                     child:
                            [{
@@ -83,31 +67,17 @@
                     child:
                            [{
                                href: '/addshop',
-                               title: 'Νέο κατάστημα'
+                               title: 'Νέο κατάστημα',
+                               disabled: true
                            },
                            {
                                href: '/addproduct',
-                               title: 'Νέο προϊόν'
+                               title: 'Νέο προϊόν',
+                               disabled: true
                            },
                            {
                                href: '/addprice',
                                title: 'Νέα τιμή'
-                           }]
-                },
-                {
-                    title: "Delete", 
-                    child:
-                           [{
-                               title: 'Διαγραφή καταστήματος',
-                               disabled: true
-                           },
-                           {
-                               title: 'Διαγραφή προϊόντος',
-                               disabled: true
-                           },
-                           {
-                               title: 'Διαγραφή τιμής',
-                               disabled: true
                            }]
                 },
                 {

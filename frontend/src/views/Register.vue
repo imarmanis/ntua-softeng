@@ -21,7 +21,7 @@
                 id="u_passgroup" label="Κωδικός" label-for="u_pass" >
               <b-form-input
                 id="u_pass"
-                ref="u_pass"
+                ref="_u_pass"
                 data-vv-as="την επιβεβαίωση"
                 v-model="user.password"
                 name="u_pass"
@@ -33,11 +33,11 @@
               <b-form-input
                 id="u_pass_conf"
                 data-vv-as="*Το πεδίο"
-                
+                v-model="user.confpass"
                 name="u_pass_conf"
                 type="password"
                 class="form-control"
-                v-validate="'required|confirmed:u_pass'"
+                v-validate="'required|confirmed:_u_pass'"
                 :state="errors.has('u_pass_conf') ? false :null"
                 placeholder="Επιβεβαιώστε τον κωδικό"
               /> 
@@ -82,6 +82,7 @@ export default {
       this.$validator.reset();
       this.user.name = null;
       this.user.password = '';
+      this.user.confpass='';
     },
   },
 }

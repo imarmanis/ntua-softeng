@@ -1,31 +1,49 @@
 <template>
     <div id="add-shop">
-          <form @submit.prevent="post">
-              <h2>Προσθήκη Νέου Καταστήματος</h2>
-              <label>Όνομα καταστήματος:</label>
-              <label>
-                  <input name="s_name" type="text"
+      <b-jumbotron lead="Προσθήκη καταστήματος">
+          <b-form @submit.prevent="post">
+            <b-form-group 
+               name="shopgroup"
+                id="shopgroup" label="Όνομα καταστήματος:"
+               label-cols =5  
+               :invalid-feedback="errors.first('s_name')" >
+              <b-form-input name="s_name" id="s_name" type="text"
                       v-validate="'required'"
                       data-vv-as="*Το πεδίο"
-                      v-model="shop.name" />
-              </label>
-              <span>
-                  {{ errors.first('s_name') }}
-              </span>
-              <label>Ετικέτες:</label>
-              <vue-tags-input
-              v-model="shop.tag"
-              placeholder = ""
-              :tags="shop.tags"
-              @tags-changed="newTags => shop.tags = newTags"
+                      v-model="shop.name" 
+                      :state="errors.has('s_name') ? false :null" 
+               />
+            </b-form-group>  
+             <b-form-group 
+               :invalid-feedback="errors.first('tag_name')"
+               id="taggroup" label="Ετικέτες:" 
+               label-cols =5 >
+              <vue-tags-input name="tag_name" type="text"
+                      v-validate="'required'"
+                      data-vv-as="*Το πεδίο"
+                      v-model="shop.tag"
+                      placeholder= ""
+                      :tags="shop.tags" 
+                       @tags-changed="newTags => shop.tags = newTags"
               />
-              <label>Πληκτρολόγησε την διεύθυνση του καταστήματος και αν θες μετακίνησε τον δείκτη στον χάρτη για μεγαλύτερη ακρίβεια στην τοποθεσία:</label>
+            </b-form-group>
+              <b-form-group 
+            id="mapgroup"
+               label="Τοποθεσία"
+                label-cols=5
+              description="Hint: Πληκτρολόγησε την διεύθυνση του καταστήματος και αν θες μετακίνησε τον δείκτη στον χάρτη για μεγαλύτερη ακρίβεια στην τοποθεσία:">
               <myMap @markerChanged="markerChanged" :with-geocoding="true" :with-location="true"></myMap>
               <label v-if="validate_address">*Η διεύθυνση του καταστήματος δεν έχει συμπληρωθεί.</label>
-              <p>
-                <input type="submit" value="Προσθήκη">
-              </p>
-          </form>
+              </b-form-group>
+             <b-container>
+             <b-row>
+             <b-col> 
+             <b-button label-cols=1 type="submit" variant="primary">Προσθήκη</b-button>
+             </b-col>
+             <b-col></b-col><b-col></b-col></b-row>
+             </b-container>
+           </b-form>
+        </b-jumbotron>
     </div>
 </template>
 

@@ -129,8 +129,11 @@ export default {
 
 <style scoped>
 #map {
-  height: 380px;
-  width: 600px;
-  margin: 0;
+  height: 200px;
+  width: 100px;
+  min-height: 100%; 
+  min-width: 100%;
+  display: block;
 }
+
 </style>

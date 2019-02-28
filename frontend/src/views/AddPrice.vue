@@ -11,8 +11,9 @@
                 id="price" 
                 type="text"
                 v-validate="'required|decimal:2|min_value:0.01'"
-                data-vv-as="*Το πεδίο"
-                v-model="price.cost" 
+                data-vv-as="*Η τιμή"
+                v-model="price.cost"
+                :state="errors.has('price') ? false :null" 
              />
           </b-form-group>
           <b-form-group
@@ -21,8 +22,8 @@
               label="Ημερομηνία  από:"
               label-cols = 5 >
                   <b-form-input name="date_from" type="date"
-                      v-validate="'required'"
-                      ref="fromDate"
+                      v-validate="'required|date_format:YYYY-MM-DD'"
+                      ref="_fromDate"
                       data-vv-as="*Η ημερομηνία"
                       v-model="price.dateFrom" 
                       :state="errors.has('date_from') ? false :null" 
@@ -36,7 +37,7 @@
               label-cols= 5 
               description="Hint: Πιέστε το βελάκι για ημερολόγιο" > 
                   <b-form-input id="date_to" name="date_to" type="date"
-                      v-validate="'required|after:fromDate,true'"
+                      v-validate="'required|date_format:YYYY-MM-DD|after:_fromDate,true'"
                       data-vv-as="*Η ημερομηνία"
                       v-model="price.dateTo"
                       :state="errors.has('date_to') ? false :null" 
@@ -50,36 +51,31 @@
                    <b-form-select v-model="price.productId"
                       v-validate="'required'"
                       name="product_name"
-<<<<<<< HEAD
                       data-vv-as="*Το πεδίο"
-                      v-for="product in products"
-                      :value="product.id"
-                      :key="product.id"
+                      :state = "errors.has('product_name') ? false :null" >
+                   <option   v-for="product in products"
+                      v-bind:value="product.id"
+                      v-bind:key="product.id" >
                       {{ product.name }}
-                  />
+                    </option>
+                  </b-form-select>
             </b-form-group>
             <b-form-group
               id="shopgroup"
-              :invalid-feedback="errors.first('shop_name')"   
+              :invalid-feedback="errors.first('shop_name')"
               label="Επίλεξε κατάστημα"
               label-cols =5   >
-                  <myMap :with-location="true" :data="shops" @markerSelected="shopSelected"></myMap>
-                  <b-form-select v-model="price.shopId"
+                 <myMap :with-location="true" :data="shops" @markerSelected="shopSelected"></myMap>
+                  <b-form-select hidden v-model="price.shopId"
                       v-validate="'required'"
-                      name="shop__name"
+                      name="shop_name"
                       data-vv-as="*Το κατάστημα"
-                      v-for="shop in shops"
-                      :value="shop.id"
-                      :key="shop.id"
-                      {{ shop.name }}
-                  />
+                      :state="errors.has('shop_name')" >
+                   </b-form-select>
             </b-form-group>
-            {{ shopData }}
-            <b-button type="submit" variante="primary">Προσθήκη</b-button>
+            <b-button type="submit" variant="primary">Προσθήκη</b-button>
           </b-form>
        </b-jumbotron>
-=======
->>>>>>> master
     </div>
 </template>
 

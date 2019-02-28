@@ -1,5 +1,6 @@
 <template>
   <div  id="add-product" >
+    <b-jumbotron lead="Προσθήκη προιόντος" >
     <b-form @submit.prevent="post" @reset="doReset" >
       <b-form-group 
         :invalid-feedback="errors.first('p_name')"
@@ -52,6 +53,7 @@
       <b-button type="submit" variant="primary">Προσθήκη</b-button>
       <b-button type="reset" variant="danger">Καθαρισμός</b-button>
     </b-form>
+   </b-jumbotron>
   </div>
 </template>
 
