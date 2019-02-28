@@ -5,7 +5,7 @@
           <b-form-group 
              :invalid-feedback="errors.first('price')"
              id="pricegroup" label="Τιμή(€):" label-for="price" 
-             label-cols = 5 >
+             label-cols = 3 >
             <b-form-input
                 name="price"
                 id="price" 
@@ -20,7 +20,7 @@
               id="dategroupfrom"
               :invalid-feedback="errors.first('date_from')"
               label="Ημερομηνία  από:"
-              label-cols = 5 >
+              label-cols = 3 >
                   <b-form-input name="date_from" type="date"
                       v-validate="'required|date_format:YYYY-MM-DD'"
                       ref="_fromDate"
@@ -34,7 +34,7 @@
               :invalid-feedback="errors.first('date_to')"   
               label="Ημερομηνία εώς:"
               label-for="date-to"  
-              label-cols= 5 
+              label-cols= 3 
               description="Hint: Πιέστε το βελάκι για ημερολόγιο" > 
                   <b-form-input id="date_to" name="date_to" type="date"
                       v-validate="'required|date_format:YYYY-MM-DD|after:_fromDate,true'"
@@ -47,7 +47,7 @@
               id="productgroup"
               :invalid-feedback="errors.first('product_name')"   
               label="Επίλεξε προιόν"
-              label-cols=5   >
+              label-cols=3   >
                    <b-form-select v-model="price.productId"
                       v-validate="'required'"
                       name="product_name"
@@ -64,7 +64,7 @@
               id="shopgroup"
               :invalid-feedback="errors.first('shop_name')"
               label="Επίλεξε κατάστημα"
-              label-cols =5   >
+              label-cols =3   >
                  <myMap :with-location="true" :data="shops" @markerSelected="shopSelected"></myMap>
                   <b-form-select hidden v-model="price.shopId"
                       v-validate="'required'"
@@ -152,7 +152,7 @@ export default {
 }
 #add-price{
     margin: 20px auto;
-    max-width: 500px;
+    max-width: 750px;
 }
 label{
     display: block;

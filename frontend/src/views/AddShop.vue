@@ -5,7 +5,7 @@
             <b-form-group 
                name="shopgroup"
                 id="shopgroup" label="Όνομα καταστήματος:"
-               label-cols =5  
+               label-cols =3  
                :invalid-feedback="errors.first('s_name')" >
               <b-form-input name="s_name" id="s_name" type="text"
                       v-validate="'required'"
@@ -17,7 +17,7 @@
              <b-form-group 
                :invalid-feedback="errors.first('tag_name')"
                id="taggroup" label="Ετικέτες:" 
-               label-cols =5 >
+               label-cols =3 >
               <vue-tags-input name="tag_name" type="text"
                       v-validate="'required'"
                       data-vv-as="*Το πεδίο"
@@ -30,18 +30,14 @@
               <b-form-group 
             id="mapgroup"
                label="Τοποθεσία"
-                label-cols=5
+                label-cols=3
               description="Hint: Πληκτρολόγησε την διεύθυνση του καταστήματος και αν θες μετακίνησε τον δείκτη στον χάρτη για μεγαλύτερη ακρίβεια στην τοποθεσία:">
               <myMap @markerChanged="markerChanged" :with-geocoding="true" :with-location="true"></myMap>
               <label v-if="validate_address">*Η διεύθυνση του καταστήματος δεν έχει συμπληρωθεί.</label>
               </b-form-group>
-             <b-container>
-             <b-row>
-             <b-col> 
+             <div class="spacer">
              <b-button label-cols=1 type="submit" variant="primary">Προσθήκη</b-button>
-             </b-col>
-             <b-col></b-col><b-col></b-col></b-row>
-             </b-container>
+             </div>
            </b-form>
         </b-jumbotron>
     </div>
@@ -121,7 +117,8 @@ export default {
 }
 #add-shop{
     margin: 20px auto;
-    max-width: 500px;
+    max-width: 750px;
+    max-height: 1000px;
 }
 label{
     display: block;
@@ -136,5 +133,8 @@ input[type="text"]{
 h3{
     margin-top: 10px;
 }
-
+.spacer {
+    padding-top: 80px;
+    padding-bottom: 40px;
+}
 </style>

@@ -32,7 +32,7 @@ export default {
 }
 #login{
     margin: 20px auto;
-    max-width: 500px;
+    max-width: 750px;
 }
 label{
     display: block;

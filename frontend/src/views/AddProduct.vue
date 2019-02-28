@@ -5,7 +5,7 @@
       <b-form-group 
         :invalid-feedback="errors.first('p_name')"
         id="p_namegroup" label="Όνομα καυσίμου:" label-for="p_name" 
-        label-cols=5>
+        label-cols=3>
         <b-form-input 
           id="p_name" 
           data-vv-as="*Το πεδίο"
@@ -19,7 +19,7 @@
       </b-form-group>
 
       <b-form-group id="desc" label="Περιγραφή:" label-for="desc"
-        label-cols=5>
+        label-cols=3>
         <b-form-textarea
           id="desc"
           type="text"
@@ -29,7 +29,7 @@
       
       <b-form-group 
         :invalid-feedback="errors.first('p_category')"
-        id="p_categroup" label="Κατηγορία:" label-for="p_category" label-cols=5 >
+        id="p_categroup" label="Κατηγορία:" label-for="p_category" label-cols=3 >
         <b-form-input 
           id="p_category" 
           data-vv-as="*Το πεδίο"
@@ -42,7 +42,7 @@
         />
       </b-form-group>
 
-      <b-form-group id="tags" label="Ετικέτες:" label-for="p_tags" label-cols=5>
+      <b-form-group id="tags" label="Ετικέτες:" label-for="p_tags" label-cols=3>
          <vue-tags-input
               id="p_tags"
               v-model="product.tag"
@@ -118,6 +118,6 @@ export default {
 }
 #add-product{
     margin: 20px auto;
-    max-width: 500px;
+    max-width: 750px;
 }
 </style>
