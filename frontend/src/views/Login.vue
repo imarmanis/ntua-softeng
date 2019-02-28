@@ -60,7 +60,7 @@ export default {
                        alert("Κάνατε login επιτυχώς!"+this.$store.getters.token);
                        this.doReset();
                        this.$router.push('/')
-                    });
+                    }).catch(err=>{alert(err)}) ;
                 }
             });
     },
