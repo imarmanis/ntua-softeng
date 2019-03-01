@@ -9,12 +9,11 @@ from sqlalchemy import asc, desc, func, or_
 from sqlalchemy.dialects.postgresql import insert
 from geoalchemy2.shape import from_shape
 from shapely.geometry import Point
+from app.resources.utils import custom_error, ErrorCode
 
 
 SORT_CHOICE = list(map('|'.join, itertools.product(['geoDist', 'price', 'date'],
                                                    ['ASC', 'DESC'])))
-
-bad_request = '', 400
 
 
 class PricesResource(Resource):
@@ -92,17 +91,17 @@ class PricesResource(Resource):
         with_geo = args['geoDist'] is not None and args['geoLng'] is not None and args['geoLat'] is not None
         no_geo = args['geoDist'] is None and args['geoLng'] is None and args['geoLat'] is None
         if not (with_geo or no_geo):
-            return bad_request
+            return custom_error('geo', ['Invalid geo parameters combination']), ErrorCode.BAD_REQUEST
 
         with_date = (args['dateFrom'] is not None and args['dateTo'] is not None) and \
                     (args['dateFrom'] <= args['dateTo'])
         no_date = args['dateFrom'] is None and args['dateTo'] is None
         if not (with_date or no_date):
-            return bad_request
+            return custom_error('date', ['Invalid date parameters combination']), ErrorCode.BAD_REQUEST
 
         sort = args['sort'].split('|')
         if (sort[0] == 'geoDist' and no_geo) or (sort[0] == 'date' and no_date):
-            return bad_request
+            return custom_error('sort', ['Invalid sort parameter']), ErrorCode.BAD_REQUEST
 
         # extra validation, some combinations are illegal
 
@@ -156,7 +155,7 @@ class PricesResource(Resource):
         prices = PricesResource.PriceSchema(many=True).dump(prices_page).data
         return {
             'start': min(start, total),  # rows skipped due to offset
-            'count': len(prices_page),
+            'count': count,
             'total': total,
             'prices': prices
         }
@@ -173,12 +172,15 @@ class PricesResource(Resource):
         date1 = args['dateFrom']
         date2 = args['dateTo']
         if not (date1 <= date2):
-            return bad_request
+            return custom_error('date', ['date(From) must be before date(To)']), ErrorCode.BAD_REQUEST
 
         shop = Shop.query.filter_by(id=args['shop_id']).first()
         product = Product.query.filter_by(id=args['product_id']).first()
-        if not (shop and product):
-            return bad_request
+        if not shop:
+            return custom_error('shop', ['Invalid shop id']), ErrorCode.NOT_FOUND
+        elif not product:
+            return custom_error('product', ['Invalid product id']), ErrorCode.NOT_FOUND
+
         del args['format']
         del args['dateFrom']
         del args['dateTo']
@@ -195,4 +197,10 @@ class PricesResource(Resource):
             Price.shop_id == args['shop_id'],
             Price.date.between(date1, date2)
         ).all()
-        return PricesResource.PriceSchema(many=True).dump(new_prices).data
+        return {
+            'start': 0,
+            'total': (date2-date1).days + 1,
+            'count': (date2-date1).days + 1,
+            # why you ask ? no idea, field must be present, can't find any sensible value
+            'prices': PricesResource.PriceSchema(many=True).dump(new_prices).data
+        }

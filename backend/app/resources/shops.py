@@ -8,7 +8,7 @@ from shapely.geometry import Point
 from sqlalchemy.exc import IntegrityError
 from app.models import Shop, ShopTag, db, ma
 from app.resources.auth import requires_auth
-from app.resources.utils import unique_stripped
+from app.resources.utils import unique_stripped, custom_error, ErrorCode
 
 
 SORT_CHOICE = list(map('|'.join, itertools.product(['name', 'id'],
@@ -28,8 +28,8 @@ class ShopTagSchema(ma.ModelSchema):
 
 class ShopSchema(ma.ModelSchema):
     tags = fields.Nested(ShopTagSchema, many=True)
-    lng = fields.Int()
-    lat = fields.Int()
+    lng = fields.Float()
+    lat = fields.Float()
 
     class Meta:
         model = Shop
@@ -99,10 +99,10 @@ class ShopsResource(Resource):
         except IntegrityError as e:
             db.session.rollback()
             if "shop_pna_c" in e.orig:
-                return {'errors': {"Address/Position/Name":
-                                   "Same address, position, name with existing shop"}}, 400
+                return custom_error('Address/Position/Name', ['Same address, position and name with existing shop']), \
+                       ErrorCode.BAD_REQUEST
             else:
-                return {'errors': {"Tags": "Duplicate tags"}}, 400  # we should never get here
+                return custom_error('tags', ['Duplicate tags']), ErrorCode.BAD_REQUEST  # we should never get here
         return shop_schema.dump(new_shop).data
 
 
@@ -134,15 +134,15 @@ class ShopResource(Resource):
             db.session.flush()
         except IntegrityError:
             db.session.rollback()
-            return {'errors': {"Address/Position/Name":
-                               "Same address, position and name with existing shop"}}, 400
+            return custom_error('Address/Position/Name', ['Same address, position and name with existing shop']), \
+                   ErrorCode.BAD_REQUEST
         # flush delete's to db to ensure delete stmts precede insert stmt and avoid integrity error
         shop.tags = [ShopTag(name=tag, shop=shop) for tag in unique_stripped(args['tags'])]
         try:
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
-            return {'errors': {"Tags": "Duplicate tags"}}, 400  # we should never get here
+            return custom_error('tags', ['Duplicate tags']), ErrorCode.BAD_REQUEST  # we should never get here
         return shop_schema.dump(shop).data
 
     @requires_auth
@@ -157,7 +157,8 @@ class ShopResource(Resource):
     def patch(self, args, shop_id, **_kwargs):
         del args['format']
         if len(args) != 1:
-            return 'Specify exactly one of: name, address, lng, lat, tags', 400
+            return custom_error('patch', ['Specify exactly one of: name, address, lng, lat, tags']), \
+                   ErrorCode.BAD_REQUEST
         shop = Shop.query.get_or_404(shop_id)
         changed = next(iter(args.keys()))
         if changed == 'tags':
@@ -179,10 +180,10 @@ class ShopResource(Resource):
         except IntegrityError:
             db.session.rollback()
             if changed == 'tags':
-                return {'errors': {"Tags": "Duplicate tags"}}, 400  # we should never get here
+                return custom_error('tags', ['Duplicate tags']), ErrorCode.BAD_REQUEST  # we should never get here
             else:
-                return {'errors': {"Address/Position/Name":
-                                   "Same address, position and name with existing shop"}}, 400
+                return custom_error('Address/Position/Name', ['Same address, position and name with existing shop']), \
+                       ErrorCode.BAD_REQUEST
 
         return ShopSchema().dump(shop).data
 
@@ -193,7 +194,7 @@ class ShopResource(Resource):
     def delete(self, _args, shop_id, is_admin, **_kwargs):
         shop = Shop.query.get(shop_id)
         if not shop:
-            return {'message': "Shop not found on DB"}, 404
+            return custom_error('shop', ['Invalid shop id']), ErrorCode.NOT_FOUND
         if is_admin:
             db.session.delete(shop)
         else:
