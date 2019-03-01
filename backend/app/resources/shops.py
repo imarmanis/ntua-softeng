@@ -73,7 +73,7 @@ class ShopsResource(Resource):
         shops_page = query.offset(start).limit(count).all()
         shops = shop_schema.dump(shops_page, many=True).data
         return {
-            'start': min(start, total),  # rows skipped due to offset
+            'start': start,  # rows skipped due to offset
             'count': len(shops_page),
             'total': total,
             'shops': shops

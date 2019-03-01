@@ -65,7 +65,7 @@ class ProductsResource(Resource):
         products = query.order_by(sort).offset(start).limit(count).all()
 
         return {
-            'start': min(start, total),  # rows skipped due to offset
+            'start': start,  # rows skipped due to offset
             'count': len(products),
             'total': total,
             'products': prod_schema.dump(products, many=True).data

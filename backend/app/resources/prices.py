@@ -154,7 +154,7 @@ class PricesResource(Resource):
         prices_page = query.offset(start).limit(count).all()
         prices = PricesResource.PriceSchema(many=True).dump(prices_page).data
         return {
-            'start': min(start, total),  # rows skipped due to offset
+            'start': start,  # rows skipped due to offset
             'count': count,
             'total': total,
             'prices': prices
