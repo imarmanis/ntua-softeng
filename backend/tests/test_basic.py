@@ -202,14 +202,14 @@ class TestBasic(object):
         assert rv.json['message'] == "OK"
 
 
-# TODO /price test
-
 RDATA = robot_data.rd
 
 
 @pytest.mark.usefixtures('root')
 class TestRobot(object):
     token = None
+    productIds = []
+    shopIds = []
 
     def test_login(self, client):
         rv = client.post(url_for('/login'), data={
@@ -234,6 +234,7 @@ class TestRobot(object):
         assert rv.status_code == 200
         valid_response(product, rv.json)
         assert not rv.json['withdrawn']
+        TestRobot.productIds.append(rv.json['id'])
 
     @pytest.mark.parametrize("query", RDATA['products_queries'])
     def test_get_product(self, client, query):
@@ -257,6 +258,7 @@ class TestRobot(object):
         assert rv.status_code == 200
         valid_response(shop, rv.json)
         assert not rv.json['withdrawn']
+        TestRobot.shopIds.append(rv.json['id'])
 
     @pytest.mark.parametrize("query", RDATA['shops_queries'])
     def test_get_shops(self, client, query):
@@ -270,7 +272,39 @@ class TestRobot(object):
         assert rv.json['total'] == len(query['results'])
         assert query['results'] == [x['name'] for x in rv.json['shops']]
 
-    # TODO test_post/get_price
+    @pytest.mark.parametrize("price", RDATA['prices'])
+    def test_post_price(self, client, price):
+        price['productId'] = TestRobot.productIds[price['productIndex']]
+        price['shopId'] = TestRobot.productIds[price['shopIndex']]
+        rv = client.post(
+            url_for('/prices'),
+            headers=auth_header(TestRobot.token),
+            data=price
+        )
+        assert rv.status_code == 200
+        for pr in rv.json['prices']:
+            assert pr['price'] == price['price']
+            assert pr['shopId'] == price['shopId']
+            assert pr['productId'] == price['productId']
+
+    @pytest.mark.parametrize("query", RDATA['prices_queries'])
+    def test_get_shops(self, client, query):
+        query['shops'] = [TestRobot.shopIds[x] for x in query['shopIndexes']]
+        query['products'] = [TestRobot.productIds[x] for x in query['productIndexes']]
+        rv = client.get(
+            url_for('/prices'),
+            query_string=query,
+            headers=auth_header(TestRobot.token)
+        )
+        assert rv.status_code == 200
+        assert rv.json['start'] == query['results']['start']
+        assert rv.json['count'] == query['results']['count']
+        assert rv.json['total'] == query['results']['total']
+        for resp, real in zip(rv.json['prices'], query['results']['prices']):
+            assert resp['price'] == real['price']
+            assert resp['date'] == real['date']
+            assert resp['shopId'] == TestRobot.shopIds[real['shopIndex']]
+            assert resp['productId'] == TestRobot.shopIds[real['productIndex']]
 
     def test_logout(self, client):
         rv = client.post(
