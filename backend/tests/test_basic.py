@@ -1,16 +1,7 @@
 import pytest
 from app.models import User
-from tests.utils import url_for, auth_header
-from tests import data
-from collections import Counter
-
-
-def valid_response(real_data, json):
-    for attr in real_data.keys():
-        if isinstance(real_data[attr], list):
-            assert Counter(real_data[attr]) == Counter(json[attr])
-        else:
-            assert real_data[attr] == json[attr]
+from tests.utils import *
+from tests import data, robot_data
 
 
 class TestBasic(object):
@@ -212,3 +203,79 @@ class TestBasic(object):
 
 
 # TODO /price test
+
+RDATA = robot_data.rd
+
+
+@pytest.mark.usefixtures('root')
+class TestRobot(object):
+    token = None
+
+    def test_login(self, client):
+        rv = client.post(url_for('/login'), data={
+            'username': 'root',
+            'password': 'root'
+        })
+        assert rv.status_code == 200
+        assert rv.json['token'] == self.root_token()
+        TestRobot.token = rv.json['token']
+
+    @staticmethod
+    def root_token():
+        return User.query.filter(User.username == 'root').first().token
+
+    @pytest.mark.parametrize("product", RDATA['products'])
+    def test_post_product(self, client, product):
+        rv = client.post(
+            url_for('/products'),
+            headers=auth_header(TestRobot.token),
+            data=product
+        )
+        assert rv.status_code == 200
+        valid_response(product, rv.json)
+        assert not rv.json['withdrawn']
+
+    @pytest.mark.parametrize("query", RDATA['products_queries'])
+    def test_get_product(self, client, query):
+        rv = client.get(
+            url_for('/products'),
+            query_string=query,
+            headers=auth_header(TestRobot.token)
+        )
+        assert rv.status_code == 200
+        assert rv.json['start'] == 0
+        assert rv.json['total'] == len(query['results'])
+        assert query['results'] == [x['name'] for x in rv.json['products']]
+
+    @pytest.mark.parametrize("shop", RDATA['shops'])
+    def test_post_shop(self, client, shop):
+        rv = client.post(
+            url_for('/shops'),
+            headers=auth_header(TestRobot.token),
+            data=shop
+        )
+        assert rv.status_code == 200
+        valid_response(shop, rv.json)
+        assert not rv.json['withdrawn']
+
+    @pytest.mark.parametrize("query", RDATA['shops_queries'])
+    def test_get_shops(self, client, query):
+        rv = client.get(
+            url_for('/shops'),
+            query_string=query,
+            headers=auth_header(TestRobot.token)
+        )
+        assert rv.status_code == 200
+        assert rv.json['start'] == 0
+        assert rv.json['total'] == len(query['results'])
+        assert query['results'] == [x['name'] for x in rv.json['shops']]
+
+    # TODO test_post/get_price
+
+    def test_logout(self, client):
+        rv = client.post(
+            url_for('/logout'),
+            headers=auth_header(TestRobot.token)
+        )
+        assert rv.status_code == 200
+        assert not self.root_token()
