@@ -61,7 +61,6 @@ import os
 SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'postgresql+psycopg2://root:root@localhost:5432/restapi'
 SQLALCHEMY_ECHO = True
 ```
-Πρέπει να υπάρχει έστω και κενό.
 
 ### Dotfiles
 .flaskenv : FLASK_APP, PORT etc
