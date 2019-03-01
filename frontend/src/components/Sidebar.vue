@@ -13,12 +13,12 @@
                     child:                           
                            [{
                                href: '/logout',
-                               title: 'Logout'
+                               title: 'Αποσύνδεση'
                            }]
                 
                 },
                 {
-                    title: "Add",
+                    title: "Προσθήκη",
                     child:
                            [{
                                href: '/addshop',
@@ -34,7 +34,7 @@
                            }]
                 },
                 {
-                    title: "Search", 
+                    title: "Αναζήτηση",
                     child:
                            [{
                                title: 'Αναζήτηση καταστήματος',
@@ -51,7 +51,7 @@
                 }]}
                 else {return [
                 {    
-                    title: "Guest",
+                    title: "Επισκέπτης",
                     child:                      
                            [{
                                href: '/register',
@@ -59,11 +59,11 @@
                            },
                            {
                                href: '/login',
-                               title: 'Login'
+                               title: 'Σύνδεση'
                            }]
                 },
                 {
-                    title: "Add",
+                    title: "Προσθήκη",
                     child:
                            [{
                                href: '/addshop',
@@ -81,7 +81,7 @@
                            }]
                 },
                 {
-                    title: "Search", 
+                    title: "Αναζήτηση",
                     child:
                           [{
                              title: 'Αναζήτηση καταστήματος',
@@ -99,7 +99,7 @@
             
        },
        data : function(){return {
-                collapsed: true,
+                collapsed: false,
                 width: '250px',
         }},
         methods: {
@@ -107,7 +107,7 @@
                  this.collapsed = val
              },
              resolveStatus(){
-                 if (this.$store.getters.user=="") {return "Guest"}
+                 if (this.$store.getters.user=="") {return "Επισκέπτης"}
                  else return this.$store.getters.user
              }
         }
@@ -136,5 +136,8 @@ body {
 .badge-danger {
   background-color: #ff2a2a;
   color: #fff;
+}
+.v-sidebar-menu .collapse-btn {
+   display:none;
 }
 </style>

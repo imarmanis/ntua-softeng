@@ -1,6 +1,6 @@
 <template>
     <div id="login">
-       <b-jumbotron lead="Login χρήστη">
+       <b-jumbotron lead="Σύνδεση χρήστη">
           <b-form @submit.prevent="login" >
             <b-form-group
               :invalid-feedback="errors.first('u_name')"
@@ -30,8 +30,8 @@
                 placeholder="Κωδικός"
               /> 
            </b-form-group>
-           <b-alert variant="danger" v-model="err.error" >ΑΠΟΤΥΧΙΑ (ελέγξε τον κωδικό)</b-alert> 
-           <b-button type="submit" variant="primary">Login</b-button>
+           <b-alert variant="danger" v-model="err.error" >ΑΠΟΤΥΧΙΑ {{this.err.msg}}</b-alert>
+           <b-button type="submit" variant="primary">Σύνδεση</b-button>
           </b-form>
         </b-jumbotron>
     </div>
@@ -49,7 +49,8 @@ export default {
         password: null
       },
       err :{
-        error: null
+        error: null,
+        msg: ""
       }
     }
   },
@@ -60,11 +61,14 @@ export default {
                   this.$store.dispatch('login', {
                     username: this.user.name,
                     password: this.user.password,
-                  }).then(()=>{
-                       alert("Κάνατε login επιτυχώς!"+this.$store.getters.token);
+                  }).then(resp=>{
+                       alert("Κάνατε login επιτυχώς!"+this.$store.getters.token+resp);
                        this.doReset();
                        this.$router.push('/')
-                    }).catch(err=>{alert(err); this.err.error=true}) ;
+
+                    }).catch(erro=>{alert(erro.response); if ('username' in erro.response.data.errors) {this.err.msg="Όνομα χρήστη δεν υπάρχει"}
+                    else if ('password' in erro.response.data.errors) {this.err.msg="Λάθος κωδικός"};
+                        this.err.error=true}) ;
                 }
             });
     },

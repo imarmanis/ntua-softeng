@@ -41,7 +41,7 @@
               data-vv-as="*Η τοποθεσία"
               :state="errors.has('shop_loc')" >
               </b-form-select>
-              <label v-if="validate_address">*Η διεύθυνση του καταστήματος δεν έχει συμπληρωθεί.</label>
+              <label style="color:red" v-if="validate_address">*Η διεύθυνση του καταστήματος δεν έχει συμπληρωθεί.</label>
               </b-form-group>
              <div class="spacer">
              <b-alert variant="success" v-model="err.suc" >ΕΠΙΤΥΧΙΑ</b-alert>
