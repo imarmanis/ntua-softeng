@@ -30,7 +30,7 @@
                 placeholder="Κωδικός"
               /> 
            </b-form-group>
-           <b-alert variant="danger" v-model="err.error" >ΑΠΟΤΥΧΙΑ {{this.err.msg}}</b-alert>
+           <b-alert variant="danger" v-model="err.error" >ΑΠΟΤΥΧΙΑ<br></br>{{this.err.msg}}</b-alert>
            <b-button type="submit" variant="primary">Σύνδεση</b-button>
           </b-form>
         </b-jumbotron>
@@ -62,11 +62,10 @@ export default {
                     username: this.user.name,
                     password: this.user.password,
                   }).then(resp=>{
-                       alert("Κάνατε login επιτυχώς!"+this.$store.getters.token+resp);
                        this.doReset();
                        this.$router.push('/')
 
-                    }).catch(erro=>{alert(erro.response); if ('username' in erro.response.data.errors) {this.err.msg="Όνομα χρήστη δεν υπάρχει"}
+                    }).catch(erro=>{if ('username' in erro.response.data.errors) {this.err.msg="Όνομα χρήστη δεν υπάρχει"}
                     else if ('password' in erro.response.data.errors) {this.err.msg="Λάθος κωδικός"};
                         this.err.error=true}) ;
                 }
