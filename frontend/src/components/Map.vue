@@ -22,6 +22,12 @@ import VGeosearch from 'vue2-leaflet-geosearch';
 import 'leaflet.locatecontrol';
 
 export default {
+  $_veeValidate: {
+    value (){
+      return this.address;
+    }
+  },
+
   components: {
         VGeosearch,
         'l-map': LMap,
@@ -76,7 +82,11 @@ export default {
         this.$emit('rclickedPos', this.clickedPos);
     },
     markerSelected : function(e, x) {
-      this.$emit('markerSelected', x);
+     //not sure how to get lng-lat we only need address to validate
+     // this.coordinates[0] = x.location.y;  // lat
+     // this.coordinates[1] = x.location.x;  // lng
+      this.address = x.address;
+      this.$emit('input', x);
       this.$refs.dataMarkers.forEach((m) => {
         m.mapObject.setIcon(new L.Icon.Default());
       });
@@ -97,7 +107,7 @@ export default {
       temp[0] = this.coordinates[0];
       temp[1] = this.coordinates[1];
       temp[2] = this.address;
-      this.$emit('markerChanged',temp);
+      this.$emit('input',temp);
     },
     dragged: function(event){
       this.coordinates[0] = event.location.lat;  // lat
@@ -106,7 +116,7 @@ export default {
       temp[0] = this.coordinates[0];
       temp[1] = this.coordinates[1];
       temp[2] = this.address;
-      this.$emit('markerChanged',temp);
+      this.$emit('input',temp);
     },
   },
   mounted(){

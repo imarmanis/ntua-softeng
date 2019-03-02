@@ -27,21 +27,13 @@
                       @tags-changed="newTags => shop.tags = newTags"
               />
             </b-form-group>
-            <b-form-group
+            <b-form-group :state="errors.has('shop_loc') ? false :null" 
             :invalid-feedback="errors.first('shop_loc')" 
             id="mapgroup"
                label="Τοποθεσία"
                 label-cols=3
               description="Hint: Πληκτρολόγησε την διεύθυνση του καταστήματος και αν θες μετακίνησε τον δείκτη στον χάρτη για μεγαλύτερη ακρίβεια στην τοποθεσία:">
-             <myMap @markerChanged="markerChanged" :with-geocoding="true" :with-location="true"></myMap>
-             <b-form-select hidden v-model="markerChanged"
-
-              v-validate="'required'"
-              name="shop_loc"
-              data-vv-as="*Η τοποθεσία"
-              :state="errors.has('shop_loc')" >
-              </b-form-select>
-              <label style="color:red" v-if="validate_address">*Η διεύθυνση του καταστήματος δεν έχει συμπληρωθεί.</label>
+             <myMap v-validate="'required'" data-vv-name="shop_loc" data-vv-as="*Η Τοποθεσία" @input="markerChanged" :with-geocoding="true" :with-location="true"></myMap>
               </b-form-group>
              <div class="spacer">
              <b-alert variant="success" v-model="err.suc" >ΕΠΙΤΥΧΙΑ</b-alert>

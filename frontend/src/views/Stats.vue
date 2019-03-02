@@ -62,13 +62,17 @@
             </b-form-group>
             <b-form-group
               id="shopgroup"
-              :invalid-feedback="errors.first('price_loc')"
-              :state="errors.has('price_loc') ? false :null"
+              :invalid-feedback="errors.first('shop_name')"
               label="Επίλεξε κατάστημα"
               label-cols =3   >
-                 <myMap v-validate="'required'" data-vv-name="price_loc" data-vv-as="*Η Τοποθεσία" :with-location="true" :data="shops" @input="shopSelected"></myMap>
+                 <myMap :with-location="true" :data="shops" @markerSelected="shopSelected"></myMap>
+                  <b-form-select hidden v-model="price.shopId"
+                      v-validate="'required'"
+                      name="shop_name"
+                      data-vv-as="*Το κατάστημα"
+                      :state="errors.has('shop_name')" >
+                   </b-form-select>
             </b-form-group>
-            <div class="spacer"> </div>
             <b-alert variant="success" v-model="err.suc">ΕΠΙΤΥΧΙΑ</b-alert>
             <b-alert variant="danger" v-model="err.error">ΑΠΟΤΥΧΙΑ</b-alert>
             <b-button type="submit" variant="primary">Προσθήκη</b-button>
@@ -110,31 +114,23 @@ export default {
       },
       post: function(){
           this.$validator.validateAll().then(valid => {
-              if(this.shopData) {
-
-                  if (valid) {
-                      this.$axios.post('/prices',
-                          qs.stringify({
-                              price: this.price.cost,
-                              dateFrom: this.price.dateFrom,
-                              dateTo: this.price.dateTo,
-                              productId: this.price.productId,
-                              shopId: this.price.shopId
-                          })
-                      ).then(() => {
-                          alert("Ευχαριστούμε για την προσθήκη μιας νέας τιμής!");
-                          this.err.error = false;
-                          this.err.suc = true;
-                          this.doReset();
-                      }).catch(err => {
-                          this.err.error = true;
-                          this.err.suc = false;
-                          alert(err)
-                      });
-                  }
+              if (valid) {
+                  this.$axios.post('/prices',
+                      qs.stringify({
+                          price: this.price.cost,
+                          dateFrom: this.price.dateFrom,
+                          dateTo: this.price.dateTo,
+                          productId: this.price.productId,
+                          shopId: this.price.shopId
+                      })
+                  ).then(() => {
+                      alert("Ευχαριστούμε για την προσθήκη μιας νέας τιμής!");
+                      this.err.error=false;this.err.suc=true;  
+                      this.doReset();
+                  }).catch(err=>{this.err.error=true;this.err.suc=false;alert(err)});
               }
-            });
-        },
+          });
+      },
     doReset: function(){
       this.$validator.reset();
       this.price.cost = null;
@@ -178,8 +174,5 @@ input[type="text"], textarea{
 h3{
     margin-top: 10px;
 }
-.spacer {
-    padding-top: 40px;
-    padding-bottom: 20px;
-}
+
 </style>
