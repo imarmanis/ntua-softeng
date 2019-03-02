@@ -93,7 +93,7 @@
                                 <myMap :data="shops"  @input="shopSelected"></myMap>
                             </b-row>
                             <b-row>
-                                <b-pagination size="md" v-model="curpage" :total-rows="this.total_count" @change="post" :per-page="2" />
+                                <b-pagination size="md" v-model="curpage" :total-rows="this.total_count" @change="post" :per-page="25" />
                                 <b-table striped hover :items="tdata" />
                             </b-row>
                         </template>
@@ -170,8 +170,8 @@ export default {
                         // no need to stringify, just set products = id instead of [ id ]
                         dateFrom : this.dateFrom,
                         dateTo : this.dateTo,
-                        start : 2*s,
-                        count : 2
+                        start : 25*s,
+                        count : 25
                     }
                     if (this.dist) {
                         params.geoDist = this.dist;
