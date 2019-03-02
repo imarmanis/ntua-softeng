@@ -18,7 +18,7 @@
         />
       </b-form-group>
 
-      <b-form-group id="desc" label="Περιγραφή:" label-for="desc"
+      <b-form-group id="p_desc" label="Περιγραφή:" label-for="desc"
         label-cols=3>
         <b-form-textarea
           id="desc"
