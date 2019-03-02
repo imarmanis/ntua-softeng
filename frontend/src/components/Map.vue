@@ -24,6 +24,10 @@ import 'leaflet.locatecontrol';
 export default {
   $_veeValidate: {
     value (){
+      if (this.withRclick) {
+        return this.clickedPos;
+        // if withRclick, validation data = clickedPos
+      }
       return this.address;
     }
   },
@@ -79,14 +83,20 @@ export default {
     rightClick: function(event) {
         if(!this.withRclick) return;
         this.clickedPos = L.latLng(event.latlng.lat, event.latlng.lng);
-        this.$emit('rclickedPos', this.clickedPos);
+        this.$emit('input', this.clickedPos);
     },
     markerSelected : function(e, x) {
      //not sure how to get lng-lat we only need address to validate
      // this.coordinates[0] = x.location.y;  // lat
      // this.coordinates[1] = x.location.x;  // lng
       this.address = x.address;
-      this.$emit('input', x);
+      if (this.withRclick) {
+        this.$emit('markerSelected', x);
+      } else {
+        this.$emit('input', x);
+      }
+      // if withRclick then the real data to be validated is clickedPos
+      // and shopSelected is just something to be emited
       this.$refs.dataMarkers.forEach((m) => {
         m.mapObject.setIcon(new L.Icon.Default());
       });
