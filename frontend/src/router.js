@@ -8,6 +8,7 @@ import SearchPrice from "./views/SearchPrice"
 import Register from "./views/Register";
 import Login from "./views/Login";
 import Logout from "./views/Logout";
+import Stats from "./views/Stats";
 
 
 Vue.use(Router);
@@ -46,6 +47,11 @@ export default new Router({
       path: '/searchPrice',
       name: 'searchPrice',
       component: SearchPrice
+    },
+    {
+      path: '/stats',
+      name: 'stats',
+      component: Stats
     },
     {
       path: '/register',

@@ -1,21 +1,7 @@
 <template>
     <div id="add-price">
-        <b-jumbotron lead="Προσθήκη τιμής">  
+        <b-jumbotron lead="Στατιστικά προϊόντος">
         <b-form @submit.prevent="post">
-          <b-form-group 
-             :invalid-feedback="errors.first('price')"
-             id="pricegroup" label="Τιμή(€):" label-for="price" 
-             label-cols = 3 >
-            <b-form-input
-                name="price"
-                id="price" 
-                type="text"
-                v-validate="'required|decimal:2|min_value:0.01'"
-                data-vv-as="*Η τιμή"
-                v-model="price.cost"
-                :state="errors.has('price') ? false :null" 
-             />
-          </b-form-group>
           <b-form-group
               id="dategroupfrom"
               :invalid-feedback="errors.first('date_from')"
@@ -25,7 +11,7 @@
                       v-validate="'required|date_format:YYYY-MM-DD'"
                       ref="_fromDate"
                       data-vv-as="*Η ημερομηνία"
-                      v-model="price.dateFrom" 
+                      v-model="dateFrom"
                       :state="errors.has('date_from') ? false :null" 
                   />
            </b-form-group>
@@ -39,7 +25,7 @@
                   <b-form-input id="date_to" name="date_to" type="date"
                       v-validate="'required|date_format:YYYY-MM-DD|after:_fromDate,true'"
                       data-vv-as="*Η ημερομηνία"
-                      v-model="price.dateTo"
+                      v-model="dateTo"
                       :state="errors.has('date_to') ? false :null" 
                    />
             </b-form-group>
@@ -48,7 +34,7 @@
               :invalid-feedback="errors.first('product_name')"   
               label="Επίλεξε προιόν"
               label-cols=3   >
-                   <b-form-select v-model="price.productId"
+                   <b-form-select v-model="productId"
                       v-validate="'required'"
                       name="product_name"
                       data-vv-as="*Το πεδίο"
@@ -60,95 +46,81 @@
                     </option>
                   </b-form-select>
             </b-form-group>
-            <b-form-group
-              id="shopgroup"
-              :invalid-feedback="errors.first('shop_name')"
-              label="Επίλεξε κατάστημα"
-              label-cols =3   >
-                 <myMap :with-location="true" :data="shops" @markerSelected="shopSelected"></myMap>
-                  <b-form-select hidden v-model="price.shopId"
-                      v-validate="'required'"
-                      name="shop_name"
-                      data-vv-as="*Το κατάστημα"
-                      :state="errors.has('shop_name')" >
-                   </b-form-select>
-            </b-form-group>
-            <b-alert variant="success" v-model="err.suc">ΕΠΙΤΥΧΙΑ</b-alert>
-            <b-alert variant="danger" v-model="err.error">ΑΠΟΤΥΧΙΑ</b-alert>
-            <b-button type="submit" variant="primary">Προσθήκη</b-button>
+            <b-button type="submit" variant="primary">Αναζήτηση</b-button>
           </b-form>
        </b-jumbotron>
+        <plot v-if="data" :chart-data="data"></plot>
     </div>
 </template>
 
 <script>
-import qs from 'qs';
-import myMap from '../components/Map.vue'
-import { L } from 'vue2-leaflet'
+import Plot from "../plugins/plot.js"
 export default {
-  components:{
-    myMap
-  },
+    components: {
+        Plot
+    },
   data() {
-    return {
-      price:{
-        cost: null,
-        dateFrom: null,
-        dateTo: null,
-        productId: null,
-        shopId: null,
-      },
-      shops: [],
-      products: [],
-      shopData: null,
-      err:{
-        error: null,
-        suc: null
+      return {
+          data :  null,
+          dateFrom: null,
+          dateTo: null,
+          productId: null,
+          products: [],
       }
-    }
   },
   methods:{
-      shopSelected: function (shop) {
-          this.price.shopId = shop.id;
-          this.shopData = shop;
-      },
       post: function(){
           this.$validator.validateAll().then(valid => {
               if (valid) {
-                  this.$axios.post('/prices',
-                      qs.stringify({
-                          price: this.price.cost,
-                          dateFrom: this.price.dateFrom,
-                          dateTo: this.price.dateTo,
-                          productId: this.price.productId,
-                          shopId: this.price.shopId
-                      })
-                  ).then(() => {
-                      alert("Ευχαριστούμε για την προσθήκη μιας νέας τιμής!");
-                      this.err.error=false;this.err.suc=true;  
+                  this.$axios.get('/prices', {
+                      params: {
+                          dateFrom: this.dateFrom,
+                          dateTo: this.dateTo,
+                          products: this.productId,
+                          sort: 'date|ASC'
+                      }
+                  }).then((resp) => {
+                      const prices = resp.data.prices;
+                      var dates = Array.from(new Set(prices.map((x) => x.date)));
+                      var mins = [];
+                      var maxs = [];
+                      dates.forEach((d) => {
+                          var prs = prices.filter((x) => x.date == d);
+                          mins.push(Math.min(...prs.map(a => a.price)));
+                          maxs.push(Math.max(...prs.map(a => a.price)));
+                          // yes, the dots are important ...
+                      });
+                      this.data = {
+                          labels: dates,
+                          datasets: [
+                              {
+                                  label: 'Ελάχιστη τιμή',
+                                  backgroundColor: '#5bf8bf',
+                                  data: mins
+                              },
+                              {
+                                  label: 'Μέγιστη τιμή',
+                                  backgroundColor: '#f87979',
+                                  data: maxs
+                              },
+                          ]
+                      };
                       this.doReset();
-                  }).catch(err=>{this.err.error=true;this.err.suc=false;alert(err)});
+                  });
               }
           });
       },
-    doReset: function(){
-      this.$validator.reset();
-      this.price.cost = null;
-      this.price.dateFrom = null;
-      this.price.dateTo = null;
-      this.price.productId = null;
-      this.price.shopId = null;
+      doReset: function(){
+          this.$validator.reset();
+          this.dateFrom = null;
+          this.dateTo = null;
+          this.productId = null;
     }
   },
   mounted(){
     this.$axios.get('/products').then((response) => {
          this.products = response.data.products;
       });
-     this.$axios.get('/shops').then((response) => {
-         const shops = response.data.shops;
-         shops.forEach((x) => x['latlng'] = new L.latLng(x.lat, x.lng));
-         this.shops = shops;
-     });
   },
 }
 </script>
