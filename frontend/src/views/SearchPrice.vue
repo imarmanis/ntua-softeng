@@ -1,15 +1,17 @@
 <template>
     <div id="search-price">
-        <b-container fluid class="bv-example-row">
-            <b-row>
+        <b-container fluid >
+           <b-row>
                 <b-col>
+                   <div id="search-price-in">
                     <b-jumbotron lead="Αναζήτηση τιμής">
                         <b-form @submit.prevent="post">
                             <b-form-group
                                     id="productgroup"
                                     :invalid-feedback="errors.first('product_name')"
                                     label="Επίλεξε προιόν"
-                                    label-cols=3   >
+                                    label-cols=4
+                                    >
                                 <b-form-select v-model="productId"
                                                v-validate="'required'"
                                                name="product_name"
@@ -26,7 +28,8 @@
                                     id="dategroupfrom"
                                     :invalid-feedback="errors.first('date_from')"
                                     label="Ημερομηνία  από:"
-                                    label-cols = 3 >
+                                    label-cols=4
+                                    >
                                 <b-form-input name="date_from" type="date"
                                               v-validate="'required|date_format:YYYY-MM-DD'"
                                               ref="_fromDate"
@@ -40,7 +43,7 @@
                                     :invalid-feedback="errors.first('date_to')"
                                     label="Ημερομηνία εώς:"
                                     label-for="date-to"
-                                    label-cols= 3
+                                    label-cols=4
                                     description="Hint: Πιέστε το βελάκι για ημερολόγιο" >
                                 <b-form-input id="date_to" name="date_to" type="date"
                                               v-validate="'required|date_format:YYYY-MM-DD|after:_fromDate,true'"
@@ -52,7 +55,8 @@
                             <b-form-group
                                     :invalid-feedback="errors.first('dist')"
                                     id="distgrop" label="Ακτίνα από σημείο ενδιαφέροντος (Km):" label-for="dist"
-                                    label-cols = 3 >
+                                    label-cols=4
+                                    >
                                 <b-form-input
                                         name="dist"
                                         id="dist"
@@ -68,24 +72,25 @@
                                           :invalid-feedback="errors.first('my_loc')"
                                           :state="errors.has('my_loc') ? false :null"
                                           label="Σημείο ενδιαφέροντος"
-                                          label-cols =3   >
+                                             >
                                 <myMap v-validate="'required'" data-vv-name="my_loc" data-vv-as="*Η Τοποθεσία"
                                        :with-rclick="true" :with-location="true" @input="rclick"></myMap>
                             </b-form-group>
                             <b-button type="submit" variant="primary">Αναζήτηση</b-button>
                         </b-form>
                     </b-jumbotron>
+                   </div>
                 </b-col>
-                <b-col v-if="showRes">
+                <b-col v-if="showRes" class="map">
                     <b-row>
                         Βρέθηκαν {{ shops.length }} σχετικά καταστήματα :
-                    </b-row>
-                    <b-row>
-                        <myMap :data="shops"  @input="shopSelected"></myMap>
+                    </b-row>                
+                    <b-row>       
+                      <myMap :data="shops"  @input="shopSelected"></myMap>
                     </b-row>
                     <b-row>
                         <b-table striped hover :items="tdata" />
-                    </b-row>
+                    </b-row>   
                 </b-col>
             </b-row>
         </b-container>
@@ -187,12 +192,25 @@ export default {
         box-sizing: border-box;
     }
     #search-price{
+        margin-top: 20px;
         margin: 20px auto;
-        max-width: 500px;
+        margin-left: 250px;
     }
+    #search-price-in{
+        margin-top: 0px;
+        margin: 0px auto;
+        max-width: 750px;
+        margin-left: 0px;
+    }
+
 
     h3{
         margin-top: 10px;
     }
+    #mapsearch{
+        margin-right: 0px;
+        margin-bottom: 0px;
+    }
+
 
 </style>
