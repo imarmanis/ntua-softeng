@@ -76,8 +76,9 @@ class PricesResource(Resource):
         'geoLat': fields.Float(missing=None, location='query'),
         'dateFrom': fields.Date(missing=None, location='query'),
         'dateTo': fields.Date(missing=None, location='query'),
-        'sort': fields.Str(missing='price|ASC', location='query',
-                           many=True, validate=validate.OneOf(SORT_CHOICE)),
+        'sort': fields.List(
+            fields.Str(validate=validate.OneOf(SORT_CHOICE)), missing=['price|ASC'], location='query'
+        ),
         'shops': fields.List(fields.Int(), missing=None, location='query'),
         'products': fields.List(fields.Int(), missing=None, location='query'),
         'tags': fields.List(fields.Str(), missing=None, location='query'),
@@ -99,9 +100,10 @@ class PricesResource(Resource):
         if not (with_date or no_date):
             return custom_error('date', ['Invalid date parameters combination']), ErrorCode.BAD_REQUEST
 
-        sort = args['sort'].split('|')
-        if (sort[0] == 'geoDist' and no_geo) or (sort[0] == 'date' and no_date):
-            return custom_error('sort', ['Invalid sort parameter']), ErrorCode.BAD_REQUEST
+        sorts = [x.split('|') for x in args['sort']]
+        for sort in sorts:
+            if (sort[0] == 'geoDist' and no_geo) or (sort[0] == 'date' and no_date):
+                return custom_error('sort', ['Invalid sort parameter']), ErrorCode.BAD_REQUEST
 
         # extra validation, some combinations are illegal
 
@@ -135,18 +137,23 @@ class PricesResource(Resource):
             # nested query to avoid recalculating distance expr
             # WHERE and HAVING clauses can't refer to column names (dist)
 
-        sort_field = {
-            'geoDist': dist_col,
-            'price': Price.price,
-            'date': Price.date
-        }[sort[0]]
+        def to_sort_operator(field, order):
+            sort_field = {
+                'geoDist': dist_col,
+                'price': Price.price,
+                'date': Price.date
+            }[field]
 
-        sort_order = {
-            'ASC': asc,
-            'DESC': desc
-        }[sort[1]]
+            sort_order = {
+                'ASC': asc,
+                'DESC': desc
+            }[order]
 
-        query = query.order_by(sort_order(sort_field))
+            return sort_order(sort_field)
+
+        query = query.order_by(
+           *[to_sort_operator(field, order) for field, order in sorts]
+        )
 
         start = args['start']
         count = args['count']
@@ -154,7 +161,7 @@ class PricesResource(Resource):
         prices_page = query.offset(start).limit(count).all()
         prices = PricesResource.PriceSchema(many=True).dump(prices_page).data
         return {
-            'start': start,  # rows skipped due to offset
+            'start': start,
             'count': count,
             'total': total,
             'prices': prices

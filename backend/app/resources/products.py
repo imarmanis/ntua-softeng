@@ -3,6 +3,7 @@ from webargs import fields, validate
 from webargs.flaskparser import use_args
 import marshmallow
 from marshmallow import post_dump
+from sqlalchemy import asc, desc
 from sqlalchemy.exc import IntegrityError
 from app.models import db, ma, Product, ProductTag
 from app.resources.auth import requires_auth
@@ -44,28 +45,40 @@ class ProductsResource(Resource):
         'count': fields.Int(missing=20, location='query', validate=validate.Range(min=0)),
         'status': fields.Str(missing='ACTIVE', location='query',
                              validate=validate.OneOf(_STATUS_CHOICE)),
-        'sort': fields.Str(missing='id|DESC', location='query',
-                           validate=validate.OneOf(_SORT_CHOICE)),
+        'sort': fields.List(
+            fields.Str(validate=validate.OneOf(_SORT_CHOICE)), missing=['id|DESC'], location='query'
+        ),
         'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))
     })
     def get(self, args, **_kwargs):
         start = args['start']
         count = args['count']
         status = args['status']
-        sort = {
-            'id|ASC': Product.id.asc(),
-            'id|DESC': Product.id.desc(),
-            'name|ASC': Product.name.asc(),
-            'name|DESC': Product.name.desc()
-        }[args['sort']]
+        sorts = [x.split('|') for x in args['sort']]
+
+        def to_sort_operator(field, order):
+            sort_field = {
+                'id': Product.id,
+                'name': Product.name
+            }[field]
+
+            sort_order = {
+                'ASC': asc,
+                'DESC': desc
+            }[order]
+
+            return sort_order(sort_field)
+
         query = Product.query
         if status != 'ALL':
             query = query.filter_by(withdrawn=(status == 'WITHDRAWN'))
         total = query.count()
-        products = query.order_by(sort).offset(start).limit(count).all()
+        products = query.order_by(
+            *[to_sort_operator(field, order) for field, order in sorts]
+        ).offset(start).limit(count).all()
 
         return {
-            'start': start,  # rows skipped due to offset
+            'start': start,
             'count': len(products),
             'total': total,
             'products': prod_schema.dump(products, many=True).data
