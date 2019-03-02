@@ -162,6 +162,7 @@ export default {
         },
         post: function(s) {
             if (!(Number.isInteger(s))) {s=0; this.curpage=0}
+            else {s=s-1}
             this.$validator.validateAll().then(valid => {
                   if (valid) {
                     let params = {
@@ -169,7 +170,7 @@ export default {
                         // no need to stringify, just set products = id instead of [ id ]
                         dateFrom : this.dateFrom,
                         dateTo : this.dateTo,
-                        start : s,
+                        start : 2*s,
                         count : 2
                     }
                     if (this.dist) {
