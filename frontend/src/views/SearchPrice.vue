@@ -3,7 +3,6 @@
         <b-container fluid >
            <b-row>
                 <b-col>
-                   <div id="search-price-in">
                     <b-jumbotron lead="Αναζήτηση τιμής">
                         <b-form @submit.prevent="post">
                             <b-form-group
@@ -79,7 +78,6 @@
                             <b-button type="submit" variant="primary">Αναζήτηση</b-button>
                         </b-form>
                     </b-jumbotron>
-                   </div>
                 </b-col>
            </b-row>
             <b-row>
@@ -95,6 +93,7 @@
                                 <myMap :data="shops"  @input="shopSelected"></myMap>
                             </b-row>
                             <b-row>
+                                <b-pagination size="md" v-model="curpage" :total-rows="this.total_count" @change="post" :per-page="2" />
                                 <b-table striped hover :items="tdata" />
                             </b-row>
                         </template>
@@ -131,7 +130,9 @@ export default {
             shops: [],
             selectedShop: null,
             rclickedPos : null,
-            showRes : false
+            showRes : false,
+            total_count: 0,
+            curpage: 0
         }
     },
     computed: {
@@ -159,14 +160,17 @@ export default {
         rclick : function (x) {
             this.rclickedPos = x
         },
-        post: function() {
+        post: function(s) {
+            if (!(Number.isInteger(s))) {s=0; this.curpage=0}
             this.$validator.validateAll().then(valid => {
-                if (valid) {
+                  if (valid) {
                     let params = {
                         products : this.productId,
                         // no need to stringify, just set products = id instead of [ id ]
                         dateFrom : this.dateFrom,
-                        dateTo : this.dateTo
+                        dateTo : this.dateTo,
+                        start : s,
+                        count : 2
                     }
                     if (this.dist) {
                         params.geoDist = this.dist;
@@ -178,6 +182,7 @@ export default {
                         }
                     ).then((resp) => {
                         const prices = resp.data.prices;
+                        this.total_count =resp.data.total;
                         const shopIds = Array.from(new Set(prices.map((x) => x.shopId)));
                         this.shops = []; // clear possbile previous data
                         this.showRes = true;
@@ -209,25 +214,11 @@ export default {
         box-sizing: border-box;
     }
     #search-price{
-        margin-top: 20px;
         margin: 20px auto;
-        margin-left: 250px;
-    }
-    #search-price-in{
-        margin-top: 0px;
-        margin: 0px auto;
         max-width: 750px;
-        margin-left: 0px;
     }
-
-
     h3{
         margin-top: 10px;
     }
-    #mapsearch{
-        margin-right: 0px;
-        margin-bottom: 0px;
-    }
-
 
 </style>
