@@ -86,6 +86,7 @@ export default {
     post: function(){
         this.$validator.validateAll().then(valid => {
             if (valid) {
+              let empty_tags = (this.product.tags.length == 0);
                 this.$axios.post(
                     '/products',
                     qs.stringify(
@@ -93,7 +94,7 @@ export default {
                             name: this.product.name,
                             description: this.product.description,
                             category: this.product.category,
-                            tags: this.product.tags.map((tag) => tag['text'])
+                            tags: empty_tags ? '' : this.product.tags.map((tag) => tag['text']),
                         },
                         {
                             arrayFormat :'repeat'

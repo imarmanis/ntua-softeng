@@ -75,12 +75,13 @@ export default {
           if(this.shop.address){
             this.validate_address = false;
             if (valid) {
+                let empty_tags = (this.shop.tags.length == 0);
                 this.$axios.post('/shops',
                     qs.stringify(
                         {
                             name: this.shop.name,
                             address: this.shop.address,
-                            tags: this.shop.tags.map((tag) => tag['text']),
+                            tags: empty_tags ? '' : this.shop.tags.map((tag) => tag['text']),
                             lat: this.shop.lat,
                             lng: this.shop.lng
                         },
