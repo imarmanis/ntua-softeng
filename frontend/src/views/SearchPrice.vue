@@ -81,16 +81,33 @@
                     </b-jumbotron>
                    </div>
                 </b-col>
-                <b-col v-if="showRes" class="map">
-                    <b-row>
-                        Βρέθηκαν {{ shops.length }} σχετικά καταστήματα :
-                    </b-row>                
-                    <b-row>       
-                      <myMap :data="shops"  @input="shopSelected"></myMap>
-                    </b-row>
-                    <b-row>
-                        <b-table striped hover :items="tdata" />
-                    </b-row>   
+           </b-row>
+            <b-row>
+                <b-col>
+                    <b-jumbotron v-if="showRes" lead="Αποτελέσματα"
+                                 class="search-price-in">
+                        <template v-if="shops.length > 0">
+                            <b-row>
+                                <p>Βρέθηκαν {{ shops.length }} σχετικά καταστήματα.</p>
+                                <p>(Προεραιτικά) Επιλέξτε το επιθυμητό στο χάρτη</p>
+                            </b-row>
+                            <b-row>
+                                <myMap :data="shops"  @input="shopSelected"></myMap>
+                            </b-row>
+                            <b-row>
+                                <b-table striped hover :items="tdata" />
+                            </b-row>
+                        </template>
+                        <template v-else>
+                            <b-row>
+                                <p>
+                                    Δεν βρέθηκαν σχετικά καταστήματα.
+                                </p>
+                            </b-row>
+
+                        </template>
+                    </b-jumbotron>
+
                 </b-col>
             </b-row>
         </b-container>
