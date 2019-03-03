@@ -88,7 +88,7 @@ class ShopsResource(Resource):
         shops = shop_schema.dump(shops_page, many=True).data
         return {
             'start': start,
-            'count': len(shops_page),
+            'count': count,
             'total': total,
             'shops': shops
         }

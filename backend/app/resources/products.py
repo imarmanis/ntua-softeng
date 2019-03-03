@@ -79,7 +79,7 @@ class ProductsResource(Resource):
 
         return {
             'start': start,
-            'count': len(products),
+            'count': count,
             'total': total,
             'products': prod_schema.dump(products, many=True).data
         }
