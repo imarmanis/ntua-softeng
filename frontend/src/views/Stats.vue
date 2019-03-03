@@ -72,50 +72,42 @@ export default {
       post: function(){
           this.$validator.validateAll().then(valid => {
               if (valid) {
-                  this.$axios.get('/prices', {
+                  this.$axios.get('/stats', {
                       params: {
                           dateFrom: this.dateFrom,
                           dateTo: this.dateTo,
-                          products: this.productId,
-                          sort: 'date|ASC'
+                          product: this.productId,
                       }
                   }).then((resp) => {
-                      const prices = resp.data.prices;
-                      var dates = Array.from(new Set(prices.map((x) => x.date)));
-                      var mins = [];
-                      var maxs = [];
-                      dates.forEach((d) => {
-                          var prs = prices.filter((x) => x.date == d);
-                          mins.push(Math.min(...prs.map(a => a.price)));
-                          maxs.push(Math.max(...prs.map(a => a.price)));
-                          // yes, the dots are important ...
-                      });
+                      const stats = resp.data;
+                      var dates = stats.map((x) => x['date']);
+                      var mins = stats.map((x) => x['min']);
+                      var avgs = stats.map((x) => x['avg']);
+                      var maxs = stats.map((x) => x['max']);
                       this.data = {
                           labels: dates,
                           datasets: [
                               {
-                                  label: 'Ελάχιστη τιμή',
+                                  label: 'Ελάχιστη τιμή (E)',
                                   backgroundColor: '#5bf8bf',
                                   data: mins
                               },
                               {
-                                  label: 'Μέγιστη τιμή',
+                                  label: 'Μέση τιμή (E)',
+                                  backgroundColor: '#d9f82b',
+                                  data: avgs
+                              },
+                              {
+                                  label: 'Μέγιστη τιμή (E)',
                                   backgroundColor: '#f87979',
                                   data: maxs
                               },
                           ]
                       };
-                      this.doReset();
                   });
               }
           });
       },
-      doReset: function(){
-          this.$validator.reset();
-          this.dateFrom = null;
-          this.dateTo = null;
-          this.productId = null;
-    }
   },
   mounted(){
     this.$axios.get('/products').then((response) => {

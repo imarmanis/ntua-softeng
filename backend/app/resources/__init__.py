@@ -4,6 +4,7 @@ from app.resources.products import ProductsResource, ProductResource
 from app.resources.prices import PricesResource
 from app.resources.shops import ShopsResource, ShopResource
 from app.resources.auth import LoginResource, LogoutResource, RegisterResource
+from app.resources.stats import StatsResource
 
 
 @parser.error_handler
@@ -20,3 +21,4 @@ api.add_resource(ShopResource, '/shops/<int:shop_id>')
 api.add_resource(LoginResource, '/login')
 api.add_resource(LogoutResource, '/logout')
 api.add_resource(RegisterResource, '/register')
+api.add_resource(StatsResource, '/stats')
