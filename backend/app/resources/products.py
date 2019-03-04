@@ -74,8 +74,9 @@ class ProductsResource(Resource):
             query = query.filter_by(withdrawn=(status == 'WITHDRAWN'))
         query = query.order_by(
             *[to_sort_operator(field, order) for field, order in sorts]
-        ).offset(start).limit(count)
+        ).offset(start)
         total = query.count()
+        query = query.limit(count)
         products = query.all()
 
         return {

@@ -157,8 +157,9 @@ class PricesResource(Resource):
 
         start = args['start']
         count = args['count']
-        query = query.offset(start).limit(count)
+        query = query.offset(start)
         total = query.count()
+        query = query.limit(count)
         prices_page = query.all()
         prices = PricesResource.PriceSchema(many=True).dump(prices_page).data
         return {
