@@ -142,7 +142,8 @@
                                 products: this.productIds,
                                 dateFrom : this.dateFrom,
                                 dateTo : this.dateTo,
-                                shops : this.selectedShop
+                                shops : this.selectedShop,
+                                sort : 'date|ASC'
                             },
                             {
                                 arrayFormat :'repeat'
