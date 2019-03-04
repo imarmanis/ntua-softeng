@@ -133,7 +133,7 @@ class PricesResource(Resource):
         if with_geo:
             subq = query.subquery()
             dist_col = subq.c.dist
-            query = db.session.query(Price, dist_col).select_entity_from(subq).filter(dist_col < args['geoDist'])
+            query = db.session.query(Price, dist_col).select_entity_from(subq).filter(dist_col < 1000*args['geoDist'])
             # nested query to avoid recalculating distance expr
             # WHERE and HAVING clauses can't refer to column names (dist)
 
