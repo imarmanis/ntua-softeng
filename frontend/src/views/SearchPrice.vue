@@ -121,7 +121,7 @@
                 return this.prices.map((p) => {
                     return {
                         'Προϊόν' : p.productName,
-                        'Τιμή' : p.price,
+                        'Τιμή (€/L)' : p.price,
                         'Ημερομηνία' : p.date,
                     }
                 })

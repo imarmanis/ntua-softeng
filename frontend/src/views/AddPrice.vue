@@ -4,13 +4,13 @@
         <b-form @submit.prevent="post">
           <b-form-group 
              :invalid-feedback="errors.first('price')"
-             id="pricegroup" label="Τιμή(€):" label-for="price" 
+             id="pricegroup" label="Τιμή(€/L):" label-for="price"
              label-cols = 3 >
             <b-form-input
                 name="price"
                 id="price" 
                 type="text"
-                v-validate="'required|decimal:2|min_value:0.01'"
+                v-validate="'required|decimal:3|min_value:0.01'"
                 data-vv-as="*Η τιμή"
                 v-model="price.cost"
                 :state="errors.has('price') ? false :null" 

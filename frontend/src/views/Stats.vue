@@ -88,17 +88,17 @@ export default {
                           labels: dates,
                           datasets: [
                               {
-                                  label: 'Ελάχιστη τιμή (E)',
+                                  label: 'Ελάχιστη τιμή (€/L)',
                                   backgroundColor: '#5bf8bf',
                                   data: mins
                               },
                               {
-                                  label: 'Μέση τιμή (E)',
+                                  label: 'Μέση τιμή (€/L)',
                                   backgroundColor: '#d9f82b',
                                   data: avgs
                               },
                               {
-                                  label: 'Μέγιστη τιμή (E)',
+                                  label: 'Μέγιστη τιμή (€/L)',
                                   backgroundColor: '#f87979',
                                   data: maxs
                               },

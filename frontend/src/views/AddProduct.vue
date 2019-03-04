@@ -38,7 +38,7 @@
           type="text"
           v-validate="'required'"
           :state="errors.has('p_category') ? false : null"
-          placeholder="πχ Αμόλυβδη"
+          placeholder="πχ Βενζίνη"
         />
       </b-form-group>
 
