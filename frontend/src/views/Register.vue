@@ -78,7 +78,6 @@ export default {
                           password: this.user.password,
                       })
                   ).then(() => {
-                      alert("Ευχαριστούμε για την προσθήκη ενός νέου χρήστη!");
                       this.doReset();
                       this.err.suc=true;
                       this.err.error=false;
@@ -104,7 +103,7 @@ export default {
 }
 #register{
     margin: 20px auto;
-    max-width: 500px;
+    max-width: 750px;
 }
 label{
     display: block;

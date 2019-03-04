@@ -13,14 +13,33 @@
                     child:                           
                            [{
                                href: '/logout',
-                               title: 'Logout'
+                               title: 'Αποσύνδεση'
                            }]
                 
                 },
+                   {
+                      title: "Αναζήτηση",
+                      child:
+                              [
+                                 {
+                                    href: '/searchPrice',
+                                    title: 'Αναζήτηση τιμής'
+                                 },
+                                 {
+                                    title: 'Αναζήτηση καταστήματος',
+                                    href: '/searchShop'
+                                 },
+                              ]
+                   },
                 {
-                    title: "Add",
+                    title: "Προσθήκη",
                     child:
-                           [{
+                           [
+                              {
+                                 href: '/addprice',
+                                 title: 'Νέα τιμή'
+                              },
+                           {
                                href: '/addshop',
                                title: 'Νέο κατάστημα'
                            },
@@ -28,30 +47,20 @@
                                href: '/addproduct',
                                title: 'Νέο προϊόν'
                            },
-                           {
-                               href: '/addprice',
-                               title: 'Νέα τιμή'
-                           }]
-                },
+                           ]
+                }, 
                 {
-                    title: "Search", 
-                    child:
-                           [{
-                               title: 'Αναζήτηση καταστήματος',
-                               disabled: true
-                           },
-                           {
-                               title: 'Αναζήτηση προϊόντος',
-                               disabled: true
-                           },
-                           {
-                               href: '/searchPrice',
-                               title: 'Αναζήτηση τιμής'
-                           }]
-                }]}
+                      title: "Στατιστικά",
+                      child:
+                              [{
+                                 href: '/stats',
+                                 title: 'Στατιστικά προϊόντος',
+                              },]
+                },
+                ]}
                 else {return [
                 {    
-                    title: "Guest",
+                    title: "Επισκέπτης",
                     child:                      
                            [{
                                href: '/register',
@@ -59,13 +68,32 @@
                            },
                            {
                                href: '/login',
-                               title: 'Login'
+                               title: 'Σύνδεση'
                            }]
                 },
+                   {
+                      title: "Αναζήτηση",
+                      child:
+                              [
+                                 {
+                                    href: '/searchPrice',
+                                    title: 'Αναζήτηση τιμής'
+                                 },
+                                 {
+                                    title: 'Αναζήτηση καταστήματος',
+                                    href: '/searchShop'
+                                 },
+                              ]
+                   },
                 {
-                    title: "Add",
+                    title: "Προσθήκη",
                     child:
-                           [{
+                           [
+                          {
+                             href: '/addprice',
+                             title: 'Νέα τιμή'
+                          },
+                          {
                                href: '/addshop',
                                title: 'Νέο κατάστημα',
                                disabled: true
@@ -75,31 +103,13 @@
                                title: 'Νέο προϊόν',
                                disabled: true
                            },
-                           {
-                               href: '/addprice',
-                               title: 'Νέα τιμή'
-                           }]
+                           ]
                 },
-                {
-                    title: "Search", 
-                    child:
-                          [{
-                             title: 'Αναζήτηση καταστήματος',
-                             disabled :true
-                           },
-                           {
-                               title: 'Αναζήτηση προϊόντος',
-                               disabled: true
-                           },
-                           {
-                               href: '/searchPrice',
-                               title: 'Αναζήτηση τιμής'
-                           }]
-                }]}}
+                ]}}
             
        },
        data : function(){return {
-                collapsed: true,
+                collapsed: false,
                 width: '250px',
         }},
         methods: {
@@ -107,7 +117,7 @@
                  this.collapsed = val
              },
              resolveStatus(){
-                 if (this.$store.getters.user=="") {return "Guest"}
+                 if (this.$store.getters.user=="") {return "Επισκέπτης"}
                  else return this.$store.getters.user
              }
         }
@@ -136,5 +146,8 @@ body {
 .badge-danger {
   background-color: #ff2a2a;
   color: #fff;
+}
+.v-sidebar-menu .collapse-btn {
+   display:none;
 }
 </style>

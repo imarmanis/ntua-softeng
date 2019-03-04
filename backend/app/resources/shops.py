@@ -5,8 +5,9 @@ from webargs.flaskparser import use_args
 from marshmallow.decorators import post_dump, pre_dump
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import Point
-from sqlalchemy import asc, desc
+from sqlalchemy import asc, desc, func
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import lazyload
 from app.models import Shop, ShopTag, db, ma
 from app.resources.auth import requires_auth
 from app.resources.utils import unique_stripped, custom_error, ErrorCode
@@ -44,6 +45,45 @@ class ShopSchema(ma.ModelSchema):
 
 
 shop_schema = ShopSchema()
+
+
+class ShopDistSchema(ma.ModelSchema):
+    lng = fields.Float()
+    lat = fields.Float()
+    dist = fields.Float()
+
+    class Meta:
+        model = Shop
+        fields = ('id', 'name', 'lat', 'lng', 'address', 'dist')
+
+    @pre_dump
+    def flatten(self, data):
+        ret = data[0]
+        ret.position = data[1]
+        ret.dist = data[2]
+        return ret
+
+    @pre_dump
+    def position_to_xy(self, data):
+        point = to_shape(data.position)
+        data.lng, data.lat = point.x, point.y
+        return data
+
+
+class ShopsDistResource(Resource):
+    @use_args({
+        'count': fields.Int(missing=20, location='query', validate=validate.Range(min=0)),
+        'dist': fields.Float(required=True, location='query', validate=validate.Range(min=0)),
+        'lng': fields.Float(required=True, location='query'),
+        'lat': fields.Float(required=True, location='query')
+    })
+    def get(self, args):
+        dist = func.ST_Distance(Shop.position, from_shape(Point(args['lng'], args['lat']), srid=4326), True). \
+            label('dist')
+        query = db.session.query(Shop, Shop.position, dist).options(lazyload('prices'), lazyload('tags')).\
+            order_by(dist.asc()).limit(args['count'])
+        shops = query.all()
+        return ShopDistSchema().dump(shops, many=True).data
 
 
 class ShopsResource(Resource):

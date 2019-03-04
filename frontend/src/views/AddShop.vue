@@ -27,21 +27,13 @@
                       @tags-changed="newTags => shop.tags = newTags"
               />
             </b-form-group>
-            <b-form-group
+            <b-form-group :state="errors.has('shop_loc') ? false :null" 
             :invalid-feedback="errors.first('shop_loc')" 
             id="mapgroup"
                label="Τοποθεσία"
                 label-cols=3
               description="Hint: Πληκτρολόγησε την διεύθυνση του καταστήματος και αν θες μετακίνησε τον δείκτη στον χάρτη για μεγαλύτερη ακρίβεια στην τοποθεσία:">
-             <myMap @markerChanged="markerChanged" :with-geocoding="true" :with-location="true"></myMap>
-             <b-form-select hidden v-model="markerChanged"
-
-              v-validate="'required'"
-              name="shop_loc"
-              data-vv-as="*Η τοποθεσία"
-              :state="errors.has('shop_loc')" >
-              </b-form-select>
-              <label v-if="validate_address">*Η διεύθυνση του καταστήματος δεν έχει συμπληρωθεί.</label>
+             <myMap v-validate="'required'" data-vv-name="shop_loc" data-vv-as="*Η Τοποθεσία" @input="markerChanged" :with-geocoding="true" :with-location="true"></myMap>
               </b-form-group>
              <div class="spacer">
              <b-alert variant="success" v-model="err.suc" >ΕΠΙΤΥΧΙΑ</b-alert>
@@ -62,7 +54,6 @@ export default {
   },
   data() {
     return {
-      validate_address: false,
       shop:{
         name: '',
         address: '',
@@ -80,15 +71,14 @@ export default {
   methods:{
     post: function(){
         this.$validator.validateAll().then(valid => {
-          if(this.shop.address){
-            this.validate_address = false;
             if (valid) {
+                let empty_tags = (this.shop.tags.length == 0);
                 this.$axios.post('/shops',
                     qs.stringify(
                         {
                             name: this.shop.name,
                             address: this.shop.address,
-                            tags: this.shop.tags.map((tag) => tag['text']),
+                            tags: empty_tags ? '' : this.shop.tags.map((tag) => tag['text']),
                             lat: this.shop.lat,
                             lng: this.shop.lng
                         },
@@ -97,7 +87,6 @@ export default {
                         }
                     )
                 ).then(() => {
-                    alert("Ευχαριστούμε για την προσθήκη ενός νέου καταστήματος!");
                     this.err.suc=true;
                     this.err.error=false;
                     this.doReset();
@@ -105,21 +94,15 @@ export default {
                          this.err.error=true;
                          this.err.suc=false;})
             }
-          }
-          else{
-              this.validate_address = true;
-          }
         });
   },
       markerChanged : function (data) {
           this.shop.lat = data[0];
           this.shop.lng = data[1];
           this.shop.address = data[2];
-          this.validate_address = false;
       },
     doReset: function(){
       this.$validator.reset();
-      this.validate_address = false;
       this.shop.name = '';
       this.shop.address = '';
       this.shop.tag = '';
