@@ -54,7 +54,6 @@ export default {
   },
   data() {
     return {
-      validate_address: false,
       shop:{
         name: '',
         address: '',
@@ -72,15 +71,14 @@ export default {
   methods:{
     post: function(){
         this.$validator.validateAll().then(valid => {
-          if(this.shop.address){
-            this.validate_address = false;
             if (valid) {
+                let empty_tags = (this.shop.tags.length == 0);
                 this.$axios.post('/shops',
                     qs.stringify(
                         {
                             name: this.shop.name,
                             address: this.shop.address,
-                            tags: this.shop.tags.map((tag) => tag['text']),
+                            tags: empty_tags ? '' : this.shop.tags.map((tag) => tag['text']),
                             lat: this.shop.lat,
                             lng: this.shop.lng
                         },
@@ -97,21 +95,15 @@ export default {
                          this.err.error=true;
                          this.err.suc=false;})
             }
-          }
-          else{
-              this.validate_address = true;
-          }
         });
   },
       markerChanged : function (data) {
           this.shop.lat = data[0];
           this.shop.lng = data[1];
           this.shop.address = data[2];
-          this.validate_address = false;
       },
     doReset: function(){
       this.$validator.reset();
-      this.validate_address = false;
       this.shop.name = '';
       this.shop.address = '';
       this.shop.tag = '';

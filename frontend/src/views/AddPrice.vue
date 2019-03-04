@@ -96,7 +96,6 @@ export default {
       },
       shops: [],
       products: [],
-      shopData: null,
       err:{
         error: null,
         suc: null
@@ -106,11 +105,9 @@ export default {
   methods:{
       shopSelected: function (shop) {
           this.price.shopId = shop.id;
-          this.shopData = shop;
       },
       post: function(){
           this.$validator.validateAll().then(valid => {
-              if(this.shopData) {
 
                   if (valid) {
                       this.$axios.post('/prices',
@@ -132,7 +129,6 @@ export default {
                           alert(err)
                       });
                   }
-              }
             });
         },
     doReset: function(){
