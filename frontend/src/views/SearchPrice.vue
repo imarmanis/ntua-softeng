@@ -168,6 +168,7 @@
                     return {
                         id : s.id,
                         latlng : L.latLng(s.lat, s.lng),
+                        address : s.address,
                         name : s.name
                     }
                 });

@@ -28,7 +28,7 @@ export default {
         return this.clickedPos;
         // if withRclick, validation data = clickedPos
       }
-      return this.shop_id;
+      return this.address;
     }
   },
 
@@ -62,7 +62,6 @@ export default {
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       coordinates: [],
       address: null,
-      shop_id: null,
       geosearchOptions: {
         provider: new OpenStreetMapProvider(),
         style: 'bar',
@@ -90,7 +89,7 @@ export default {
      //not sure how to get lng-lat we only need address to validate
      // this.coordinates[0] = x.location.y;  // lat
      // this.coordinates[1] = x.location.x;  // lng
-      this.shop_id = x.id;
+      this.address = x.address;
       if (this.withRclick) {
         this.$emit('markerSelected', x);
       } else {
