@@ -90,8 +90,10 @@ class ShopsResource(Resource):
     @use_args({
         'start': fields.Int(missing=0, location='query', validate=validate.Range(min=0)),
         'count': fields.Int(missing=20, location='query', validate=validate.Range(min=0)),
-        'sort': fields.Str(missing='id|ASC', location='query',
-                           many=True, validate=validate.OneOf(SORT_CHOICE)),
+        'sort': fields.List(
+            fields.Str(validate=validate.OneOf(SORT_CHOICE)), missing=['id|DESC'], location='query'
+            # default sort order not explicitly specified, maybe same as products?
+        ),
         'status': fields.Str(missing='ACTIVE', location='query',
                              validate=validate.OneOf(STATUS_CHOICE)),
         'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))
@@ -101,21 +103,32 @@ class ShopsResource(Resource):
         start = args['start']
         count = args['count']
         status = args['status']
-        sort = {
-            'id|ASC': Shop.id.asc(),
-            'id|DESC': Shop.id.desc(),
-            'name|ASC': Shop.name.asc(),
-            'name|DESC': Shop.name.desc()
-        }[args['sort']]
+        sorts = [x.split('|') for x in args['sort']]
+
+        def to_sort_operator(field, order):
+            sort_field = {
+                'id': Shop.id,
+                'name': Shop.name
+            }[field]
+
+            sort_order = {
+                'ASC': asc,
+                'DESC': desc
+            }[order]
+
+            return sort_order(sort_field)
+
         if status != 'ALL':
             query = query.filter_by(withdrawn=(status == 'WITHDRAWN'))
-        query = query.order_by(sort)
+        query = query.order_by(
+            *[to_sort_operator(field, order) for field, order in sorts]
+        )
         total = query.count()
         shops_page = query.offset(start).limit(count).all()
         shops = shop_schema.dump(shops_page, many=True).data
         return {
-            'start': start,  # rows skipped due to offset
-            'count': len(shops_page),
+            'start': start,
+            'count': count,
             'total': total,
             'shops': shops
         }

@@ -17,6 +17,7 @@
     "leaflet-geosearch": "^2.7.0",
     "leaflet.locatecontrol": "^0.66.1",
     "qs": "^6.6.0",
+    "serve": "^10.1.2",
     "vee-validate": "^2.1.7",
     "vue": "^2.6.7",
     "vue-chartjs": "^3.4.0",
