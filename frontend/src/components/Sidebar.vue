@@ -17,10 +17,29 @@
                            }]
                 
                 },
+                   {
+                      title: "Αναζήτηση",
+                      child:
+                              [
+                                 {
+                                    href: '/searchPrice',
+                                    title: 'Αναζήτηση τιμής'
+                                 },
+                                 {
+                                    title: 'Αναζήτηση καταστήματος',
+                                    href: '/searchShop'
+                                 },
+                              ]
+                   },
                 {
                     title: "Προσθήκη",
                     child:
-                           [{
+                           [
+                              {
+                                 href: '/addprice',
+                                 title: 'Νέα τιμή'
+                              },
+                           {
                                href: '/addshop',
                                title: 'Νέο κατάστημα'
                            },
@@ -28,10 +47,7 @@
                                href: '/addproduct',
                                title: 'Νέο προϊόν'
                            },
-                           {
-                               href: '/addprice',
-                               title: 'Νέα τιμή'
-                           }]
+                           ]
                 }, 
                 {
                       title: "Στατιστικά",
@@ -41,20 +57,7 @@
                                  title: 'Στατιστικά προϊόντος',
                               },]
                 },
-                {
-                    title: "Αναζήτηση",
-                     child:
-                          [
-                             {
-                                href: '/searchPrice',
-                                title: 'Αναζήτηση τιμής'
-                             },
-                             {
-                                title: 'Αναζήτηση καταστήματος',
-                                href: '/searchShop'
-                             },
-                          ]
-                }]}
+                ]}
                 else {return [
                 {    
                     title: "Επισκέπτης",
@@ -68,10 +71,29 @@
                                title: 'Σύνδεση'
                            }]
                 },
+                   {
+                      title: "Αναζήτηση",
+                      child:
+                              [
+                                 {
+                                    href: '/searchPrice',
+                                    title: 'Αναζήτηση τιμής'
+                                 },
+                                 {
+                                    title: 'Αναζήτηση καταστήματος',
+                                    href: '/searchShop'
+                                 },
+                              ]
+                   },
                 {
                     title: "Προσθήκη",
                     child:
-                           [{
+                           [
+                          {
+                             href: '/addprice',
+                             title: 'Νέα τιμή'
+                          },
+                          {
                                href: '/addshop',
                                title: 'Νέο κατάστημα',
                                disabled: true
@@ -81,25 +103,9 @@
                                title: 'Νέο προϊόν',
                                disabled: true
                            },
-                           {
-                               href: '/addprice',
-                               title: 'Νέα τιμή'
-                           }]
+                           ]
                 },
-                {
-                    title: "Αναζήτηση",
-                    child:
-                          [
-                             {
-                                href: '/searchPrice',
-                                title: 'Αναζήτηση τιμής'
-                             },
-                             {
-                                title: 'Αναζήτηση καταστήματος',
-                                href: '/searchShop'
-                             },
-                          ]
-                }]}}
+                ]}}
             
        },
        data : function(){return {
