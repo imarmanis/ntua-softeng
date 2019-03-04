@@ -119,7 +119,6 @@ export default {
                               shopId: this.price.shopId
                           })
                       ).then(() => {
-                          alert("Ευχαριστούμε για την προσθήκη μιας νέας τιμής!");
                           this.err.error = false;
                           this.err.suc = true;
                           this.doReset();

@@ -101,7 +101,6 @@ export default {
                         }
                     )
                 ).then(()=>{
-                    alert("Ευχαριστούμε για την προσθήκη ενός νέου προϊόντος!");
                     this.err.error=false;this.err.suc=true;
                     this.doReset();
                 }).catch(err=>{this.err.error=true;this.err.suc=false;alert(err)});

@@ -78,7 +78,6 @@ export default {
                           password: this.user.password,
                       })
                   ).then(() => {
-                      alert("Ευχαριστούμε για την προσθήκη ενός νέου χρήστη!");
                       this.doReset();
                       this.err.suc=true;
                       this.err.error=false;

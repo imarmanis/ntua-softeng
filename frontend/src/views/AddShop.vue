@@ -87,7 +87,6 @@ export default {
                         }
                     )
                 ).then(() => {
-                    alert("Ευχαριστούμε για την προσθήκη ενός νέου καταστήματος!");
                     this.err.suc=true;
                     this.err.error=false;
                     this.doReset();
