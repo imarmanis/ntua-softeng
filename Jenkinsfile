@@ -12,9 +12,6 @@ pipeline {
                     python -m venv venv
                     . venv/bin/activate
                     pip install -r requirements.txt
-
-                    mkdir -p instance
-                    touch instance/config.py
                 '''
             }
         }
