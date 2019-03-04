@@ -179,7 +179,7 @@ class PricesResource(Resource):
         'shopId': fields.Int(required=True, attribute='shop_id', location='form'),
         'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))
     })
-    def post(self, args):
+    def post(self, args, **_kwargs):
         date1 = args['dateFrom']
         date2 = args['dateTo']
         if not (date1 <= date2):
