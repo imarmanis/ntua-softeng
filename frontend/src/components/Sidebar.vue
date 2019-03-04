@@ -85,26 +85,6 @@
                                  },
                               ]
                    },
-                {
-                    title: "Προσθήκη",
-                    child:
-                           [
-                          {
-                             href: '/addprice',
-                             title: 'Νέα τιμή'
-                          },
-                          {
-                               href: '/addshop',
-                               title: 'Νέο κατάστημα',
-                               disabled: true
-                           },
-                           {
-                               href: '/addproduct',
-                               title: 'Νέο προϊόν',
-                               disabled: true
-                           },
-                           ]
-                },
                 ]}}
             
        },

@@ -4,6 +4,7 @@ from flask_restful import Resource
 from webargs import fields, validate
 from webargs.flaskparser import use_args
 from marshmallow.decorators import post_dump, pre_dump
+from app.resources.auth import requires_auth
 from app.models import Product, Shop, Price, db, ma, ProductTag, ShopTag
 from sqlalchemy import asc, desc, func, or_
 from sqlalchemy.dialects.postgresql import insert
@@ -169,6 +170,7 @@ class PricesResource(Resource):
             'prices': prices
         }
 
+    @requires_auth
     @use_args({
         'price': fields.Float(required=True, location='form'),
         'dateFrom': fields.Date(required=True, location='form'),

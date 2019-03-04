@@ -71,6 +71,7 @@ class ShopDistSchema(ma.ModelSchema):
 
 
 class ShopsDistResource(Resource):
+    @requires_auth
     @use_args({
         'count': fields.Int(missing=20, location='query', validate=validate.Range(min=0)),
         'dist': fields.Float(required=True, location='query', validate=validate.Range(min=0)),
