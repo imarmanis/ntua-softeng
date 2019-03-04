@@ -1,7 +1,8 @@
 import pytest
 from app.models import User
 from tests.utils import *
-from tests import data, robot_data
+from tests import data
+import json
 
 
 class TestBasic(object):
@@ -61,7 +62,7 @@ class TestBasic(object):
 
         assert rv.status_code == 200
         assert rv.json['start'] == 0
-        assert rv.json['count'] == 2
+        assert rv.json['count'] == 10
         assert rv.json['total'] == 2
         assert len(rv.json['products']) == 2
         for i, product in enumerate(data.products):
@@ -138,7 +139,7 @@ class TestBasic(object):
 
         assert rv.status_code == 200
         assert rv.json['start'] == 0
-        assert rv.json['count'] == 2
+        assert rv.json['count'] == 10
         assert rv.json['total'] == 2
         assert len(rv.json['shops']) == 2
         for i, shop_data in enumerate(data.shops):
@@ -202,7 +203,8 @@ class TestBasic(object):
         assert rv.json['message'] == "OK"
 
 
-RDATA = robot_data.rd
+with open('test-data.json') as f:
+        RDATA = json.load(f)
 
 
 @pytest.mark.usefixtures('root')
