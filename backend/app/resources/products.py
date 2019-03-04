@@ -72,10 +72,11 @@ class ProductsResource(Resource):
         query = Product.query
         if status != 'ALL':
             query = query.filter_by(withdrawn=(status == 'WITHDRAWN'))
-        total = query.count()
-        products = query.order_by(
+        query = query.order_by(
             *[to_sort_operator(field, order) for field, order in sorts]
-        ).offset(start).limit(count).all()
+        ).offset(start).limit(count)
+        total = query.count()
+        products = query.all()
 
         return {
             'start': start,
