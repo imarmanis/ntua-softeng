@@ -91,18 +91,16 @@
                 {
                     title: "Αναζήτηση",
                     child:
-                          [{
-                             title: 'Αναζήτηση καταστήματος',
-                             disabled :true
-                           },
-                           {
-                               title: 'Αναζήτηση προϊόντος',
-                               disabled: true
-                           },
-                           {
-                               href: '/searchPrice',
-                               title: 'Αναζήτηση τιμής'
-                           }]
+                          [
+                             {
+                                href: '/searchPrice',
+                                title: 'Αναζήτηση τιμής'
+                             },
+                             {
+                                title: 'Αναζήτηση καταστήματος',
+                                href: '/searchShop'
+                             },
+                          ]
                 }]}}
             
        },
