@@ -5,6 +5,7 @@ import AddShop from "./views/AddShop";
 import AddProduct from "./views/AddProduct";
 import AddPrice from "./views/AddPrice";
 import SearchPrice from "./views/SearchPrice"
+import SearchShop from "./views/SearchShop"
 import Register from "./views/Register";
 import Login from "./views/Login";
 import Logout from "./views/Logout";
@@ -47,6 +48,11 @@ export default new Router({
       path: '/searchPrice',
       name: 'searchPrice',
       component: SearchPrice
+    },
+    {
+      path: '/searchShop',
+      name: 'searchShop',
+      component: SearchShop
     },
     {
       path: '/stats',
