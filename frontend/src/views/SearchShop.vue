@@ -4,7 +4,7 @@ import {L} from "vue2-leaflet";
         <b-container fluid >
            <b-row>
                 <b-col>
-                    <b-jumbotron lead="Αναζήτηση καταστήματος σε αύξοσα απόσταση">
+                    <b-jumbotron lead="Αναζήτηση καταστήματος σε αύξουσα απόσταση">
                         <b-form @submit.prevent="post">
                             <b-form-group
                                     :invalid-feedback="errors.first('dist')"
@@ -107,6 +107,7 @@ import {L} from "vue2-leaflet";
                             }
                         }
                     ).then((resp) => {
+                        this.selectedShop = null;
                         this.shops = resp.data.map((s) => {
                             return {
                                 'sname': s.name,

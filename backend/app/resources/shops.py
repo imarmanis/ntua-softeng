@@ -60,7 +60,7 @@ class ShopDistSchema(ma.ModelSchema):
     def flatten(self, data):
         ret = data[0]
         ret.position = data[1]
-        ret.dist = data[2]
+        ret.dist = data[2]/1000
         return ret
 
     @pre_dump
