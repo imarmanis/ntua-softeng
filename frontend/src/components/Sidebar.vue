@@ -1,5 +1,5 @@
 <template>
-   <sidebar-menu :menu="menu" :collapsed="collapsed" :width="width"/>
+   <sidebar-menu :menu="menu" :collapsed="collapsed" @collapse="onCollapse"  :width="width"/>
 </template>
 
 <script>
@@ -7,81 +7,100 @@
         computed: {
                 menu: function(){
                 if (this.$store.getters.LoggedIn) {
-                return [
+                return [ 
                 {
                     title: this.$store.getters.user,
+                    icon: 'fa fa-user',
                     child:                           
                            [{
                                href: '/logout',
+                               icon: 'fas fa-sign-out-alt',
                                title: 'Αποσύνδεση'
                            }]
                 
                 },
                    {
                       title: "Αναζήτηση",
+                      icon: 'fa fa-eye',
                       child:
                               [
                                  {
                                     href: '/searchPrice',
+                                    icon: 'fas fa-dollar-sign',
                                     title: 'Αναζήτηση τιμής'
                                  },
                                  {
                                     title: 'Αναζήτηση καταστήματος',
+                                    icon: 'fa fa-gas-pump',
                                     href: '/searchShop'
                                  },
                               ]
                    },
                 {
                     title: "Προσθήκη",
+                    icon: 'fas fa-plus',
                     child:
                            [
                               {
                                  href: '/addprice',
-                                 title: 'Νέα τιμή'
+                                 title: 'Νέα τιμή',
+                                 icon: 'fas fa-dollar-sign'
                               },
                            {
                                href: '/addshop',
-                               title: 'Νέο κατάστημα'
+                               title: 'Νέο κατάστημα',
+                               icon: 'fa fa-gas-pump',
                            },
                            {
                                href: '/addproduct',
+                               icon: 'fab fa-product-hunt',
                                title: 'Νέο προϊόν'
                            },
                            ]
                 }, 
                 {
                       title: "Στατιστικά",
+                      icon: 'fa fa-chart-area',
                       child:
                               [{
                                  href: '/stats',
+                                 icon: 'fa fa-gas-pump',
                                  title: 'Στατιστικά προϊόντος',
                               },]
                 },
                 ]}
                 else {return [
-                {    
+                {
+
+    
                     title: "Επισκέπτης",
+                    icon: 'fa fa-user',
                     child:                      
                            [{
                                href: '/register',
-                               title: 'Εγγραφή'
+                               title: 'Εγγραφή',
+                               icon: 'fa fa-user-plus'
                            },
                            {
                                href: '/login',
-                               title: 'Σύνδεση'
+                               title: 'Σύνδεση',
+                               icon: 'fas fa-sign-in-alt'
                            }]
                 },
                    {
                       title: "Αναζήτηση",
+                      icon: 'fa fa-eye',
                       child:
                               [
                                  {
                                     href: '/searchPrice',
+                                    icon: 'fas fa-dollar-sign',
                                     title: 'Αναζήτηση τιμής'
                                  },
                                  {
                                     title: 'Αναζήτηση καταστήματος',
-                                    href: '/searchShop'
+                                    href: '/searchShop',
+                                    icon: 'fa fa-gas-pump'
                                  },
                               ]
                    },
@@ -94,6 +113,7 @@
         }},
         methods: {
              onCollapse(val){
+                 this.$emit('collapse',val);
                  this.collapsed = val
              },
              resolveStatus(){
@@ -127,7 +147,14 @@ body {
   background-color: #ff2a2a;
   color: #fff;
 }
+.v-sidebar-menu {
+  padding-top: 50px;
+}
 .v-sidebar-menu .collapse-btn {
-   display:none;
+  top: 0px;
+  display: block;
+}
+.v-sidebar-menu .vsm-collapsed{
+  width: 0;
 }
 </style>
