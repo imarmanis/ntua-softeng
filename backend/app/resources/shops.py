@@ -71,18 +71,16 @@ class ShopDistSchema(ma.ModelSchema):
 
 
 class ShopsDistResource(Resource):
-    @requires_auth
     @use_args({
         'count': fields.Int(missing=20, location='query', validate=validate.Range(min=0)),
         'dist': fields.Float(required=True, location='query', validate=validate.Range(min=0)),
         'lng': fields.Float(required=True, location='query'),
         'lat': fields.Float(required=True, location='query')
     })
-    def get(self, args):
+    def get(self, args, **_kwargs):
         dist = func.ST_Distance(Shop.position, from_shape(Point(args['lng'], args['lat']), srid=4326), True). \
             label('dist')
-        query = db.session.query(Shop, Shop.position, dist).options(lazyload('prices'), lazyload('tags')).\
-            order_by(dist.asc()).limit(args['count'])
+        query = db.session.query(Shop, Shop.position, dist).options(lazyload('prices'), lazyload('tags')).filter(dist < 1000*args['dist']).order_by(dist.asc()).limit(args['count'])
         shops = query.all()
         return ShopDistSchema().dump(shops, many=True).data
 
