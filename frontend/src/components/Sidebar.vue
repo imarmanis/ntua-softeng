@@ -1,5 +1,5 @@
 <template>
-   <sidebar-menu :menu="menu" :collapsed="collapsed"  :width="width"/>
+   <sidebar-menu :menu="menu" :collapsed="collapsed" @collapse="onCollapse"  :width="width"/>
 </template>
 
 <script>
@@ -113,6 +113,7 @@
         }},
         methods: {
              onCollapse(val){
+                 this.$emit('collapse',val);
                  this.collapsed = val
              },
              resolveStatus(){
