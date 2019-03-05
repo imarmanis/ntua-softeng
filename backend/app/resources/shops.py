@@ -124,9 +124,8 @@ class ShopsResource(Resource):
         query = query.order_by(
             *[to_sort_operator(field, order) for field, order in sorts]
         )
-        query = query.offset(start)
         total = query.count()
-        query = query.limit(count)
+        query = query.offset(start).limit(count)
         shops_page = query.all()
         shops = shop_schema.dump(shops_page, many=True).data
         return {
