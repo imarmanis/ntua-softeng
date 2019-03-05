@@ -1,7 +1,9 @@
 <template>
   <div id="app">
-    <app-sidebar/>
+   <div class="container">
     <router-view/>
+  </div>
+  <app-sidebar/>
   </div>
 </template>
 
@@ -22,6 +24,7 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  padding-left: 50px;
 }
 
 </style>
