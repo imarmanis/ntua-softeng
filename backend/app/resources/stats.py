@@ -2,6 +2,7 @@ from flask_restful import Resource
 from webargs import fields, validate
 from webargs.flaskparser import use_args
 from app.models import Price, db, ma
+from app.resources.auth import requires_auth
 from sqlalchemy import func
 
 
@@ -22,13 +23,14 @@ class Stat:
 
 class StatsResource(Resource):
 
+    @requires_auth
     @use_args({
         'dateFrom': fields.Date(required=True, location='query'),
         'dateTo': fields.Date(required=True, location='query'),
         'product': fields.Int(required=True, location='query'),
         'format': fields.Str(missing='json', location='query', validate=validate.Equal('json'))
     })
-    def get(self, args):
+    def get(self, args, **kwargs):
         query = db.session.query(Price.date, func.min(Price.price), func.avg(Price.price), func.max(Price.price)).\
             filter(Price.product_id == args['product'], Price.date.between(args['dateFrom'], args['dateTo'])).\
             group_by(Price.date).order_by(Price.date.asc())
